@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Play } from 'lucide-react';
+import { ArrowRight, Play, Eye, Target, RefreshCw, TrendingUp, Building2 } from 'lucide-react';
 import { CinematicIntro, NexoraLogo } from '../components/CinematicIntro';
 import illuminatedWarehouseBg from '../assets/nexora_warehouse_illuminated.jpg';
+import warehouseBg from '../assets/nexora_obsidian_warehouse.jpg';
 
 /* ─── Reusable Animated Section ─── */
 const RevealSection = ({ children, className = '', delay = 0 }) => {
@@ -105,7 +106,7 @@ export const LandingPage = () => {
     const handleMouseMove = (e) => {
       if (prefersReducedMotion || window.innerWidth < 768) return;
       const { clientX, clientY } = e;
-      const x = (clientX / window.innerWidth - 0.5) * 10; // Max 10px
+      const x = (clientX / window.innerWidth - 0.5) * 10;
       const y = (clientY / window.innerHeight - 0.5) * 10;
       setMousePos({ x, y });
     };
@@ -160,14 +161,14 @@ export const LandingPage = () => {
             </div>
           </nav>
 
-          {/* ══════════ HERO (ILLUMINATED CINEMATIC MOVING WAREHOUSE) ══════════ */}
+          {/* ══════════ HERO (FULL-SCREEN CINEMATIC MOVING WAREHOUSE) ══════════ */}
           <motion.section
             style={{ opacity: heroOpacity, y: heroY, scale: heroScale }}
             className="relative min-h-screen flex items-center justify-center px-8 overflow-hidden"
           >
-            {/* ── ILLUMINATED CINEMATIC MOVING WAREHOUSE BACKGROUND ── */}
+            {/* ── CINEMATIC MULTI-LAYER MOVING WAREHOUSE BACKGROUND ── */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-              {/* Layer 1: Slow Seamless Camera Push Background Image */}
+              {/* Layer 1: Slow Camera Push Background Image */}
               <motion.div
                 className="absolute inset-0 w-full h-full bg-cover bg-center opacity-95"
                 style={{
@@ -311,7 +312,7 @@ export const LandingPage = () => {
                 />
               )}
 
-              {/* Layer 8: Selective Vignette Overlay (10-15% Brighter Center-Right Aisle, Crisp Left Text Backdrop) */}
+              {/* Layer 8: Selective Vignette Overlay */}
               <div
                 className="absolute inset-0"
                 style={{
@@ -324,7 +325,7 @@ export const LandingPage = () => {
               />
             </div>
 
-            {/* ── HERO CONTENT (Balanced Composition: Left Headline, Open Right Warehouse View) ── */}
+            {/* ── HERO CONTENT (Balanced Composition) ── */}
             <div className="relative z-10 max-w-[1400px] mx-auto w-full pt-32 pb-20 flex flex-col justify-center">
               <div className="max-w-2xl lg:max-w-3xl">
                 <div className="mb-12">
@@ -406,20 +407,256 @@ export const LandingPage = () => {
             </div>
           </motion.section>
 
-          {/* ══════════ TYPOGRAPHY SECTION ══════════ */}
-          <section className="py-40 px-8">
-            <div className="max-w-[1200px] mx-auto">
-              <LineReveal text="INVENTORY" className="font-display text-[clamp(2.5rem,8vw,7rem)] leading-[1] tracking-[-0.03em]" style={{ color: '#F5F3EE' }} />
-              <LineReveal text="SHOULD NOT" className="font-display text-[clamp(2.5rem,8vw,7rem)] leading-[1] tracking-[-0.03em]" style={{ color: '#5A5D63' }} delay={0.15} />
-              <LineReveal text="BE A GUESS." className="font-display text-[clamp(2.5rem,8vw,7rem)] leading-[1] tracking-[-0.03em] text-gradient-gold" delay={0.3} />
+          {/* ══════════ SECTION 02 — PREMIUM PRODUCT EXPERIENCE ══════════ */}
+          <section className="py-36 px-8 relative overflow-hidden" style={{ backgroundColor: '#050608' }}>
+            {/* Ambient Background Glow */}
+            <div
+              className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[600px] h-[600px] rounded-full pointer-events-none opacity-[0.03]"
+              style={{ background: 'radial-gradient(circle, #D6A85F, transparent 70%)' }}
+            />
 
-              <div className="mt-24 grid grid-cols-2 md:grid-cols-4 gap-8">
-                {['SEE IT.', 'TRACK IT.', 'RECONCILE IT.', 'OPTIMIZE IT.'].map((t, i) => (
-                  <RevealSection key={i} delay={i * 0.1}>
-                    <div className="text-xl md:text-2xl font-display tracking-wide" style={{ color: i === 3 ? '#D6A85F' : '#A6A9AF' }}>{t}</div>
+            <div className="max-w-[1400px] mx-auto">
+              {/* ── TOP SPLIT: Editorial Headline (Left) & Cinematic Warehouse Intelligence (Right) ── */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center mb-32">
+                
+                {/* LEFT SIDE: Eyebrow, Headline, Description, CTA */}
+                <div className="lg:col-span-6">
+                  <RevealSection>
+                    {/* Eyebrow */}
+                    <div className="flex items-center gap-3 mb-6">
+                      <span className="h-[1px] w-8 bg-[#D6A85F]" />
+                      <p className="text-xs font-semibold tracking-[0.3em] uppercase" style={{ color: '#D6A85F' }}>
+                        INVENTORY INTELLIGENCE
+                      </p>
+                    </div>
+
+                    {/* Headline */}
+                    <div className="mb-8">
+                      <LineReveal text="INVENTORY" className="font-display text-[clamp(2.8rem,5.5vw,5.2rem)] leading-[0.98] tracking-[-0.03em]" style={{ color: '#F5F3EE' }} />
+                      <LineReveal text="SHOULD NOT" className="font-display text-[clamp(2.8rem,5.5vw,5.2rem)] leading-[0.98] tracking-[-0.03em]" style={{ color: '#F5F3EE' }} delay={0.12} />
+                      <LineReveal text="BE A GUESS." className="font-display text-[clamp(2.8rem,5.5vw,5.2rem)] leading-[0.98] tracking-[-0.03em] text-gradient-gold" delay={0.24} />
+                    </div>
+
+                    {/* Description */}
+                    <p className="text-base md:text-lg leading-relaxed mb-10 max-w-xl" style={{ color: '#A6A9AF' }}>
+                      NEXORA gives you real-time visibility, complete control and intelligent optimization across every warehouse.
+                    </p>
+
+                    {/* CTA */}
+                    <button
+                      onClick={() => navigate('/login')}
+                      className="group inline-flex items-center gap-3 text-xs font-semibold tracking-[0.2em] uppercase px-7 py-3.5 rounded-lg border transition-all duration-300 hover:border-[#D6A85F] hover:bg-[#D6A85F]/10"
+                      style={{ borderColor: 'rgba(214,168,95,0.3)', color: '#D6A85F' }}
+                    >
+                      EXPLORE INVENTORY
+                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    </button>
                   </RevealSection>
-                ))}
+                </div>
+
+                {/* RIGHT SIDE: Realistic Warehouse Visualization with Digital Intelligence Overlay Cards */}
+                <div className="lg:col-span-6">
+                  <RevealSection delay={0.2}>
+                    <div className="relative rounded-2xl border overflow-hidden p-6 md:p-8 shadow-2xl" style={{ backgroundColor: '#0B1017', borderColor: '#1E293B' }}>
+                      
+                      {/* Background Warehouse Image with Dark Gradient Overlay */}
+                      <div
+                        className="absolute inset-0 bg-cover bg-center opacity-35 pointer-events-none"
+                        style={{ backgroundImage: `url(${warehouseBg})` }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0B1017] via-transparent to-[#0B1017]/80 pointer-events-none" />
+
+                      {/* Warehouse Floor Gold Tracking Route Lines */}
+                      <svg className="absolute inset-0 w-full h-full opacity-35 pointer-events-none">
+                        <motion.path
+                          d="M 10% 80% Q 40% 60% 70% 85% T 90% 40%"
+                          fill="none"
+                          stroke="#D6A85F"
+                          strokeWidth="1.5"
+                          strokeDasharray="6 6"
+                          initial={{ pathLength: 0 }}
+                          whileInView={{ pathLength: 1 }}
+                          viewport={{ once: true }}
+                          transition={{ duration: 2, delay: 0.5 }}
+                        />
+                        <motion.circle
+                          cx="70%" cy="85%" r="4"
+                          fill="#D6A85F"
+                          initial={{ scale: 0 }}
+                          whileInView={{ scale: 1 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: 1.5 }}
+                        />
+                      </svg>
+
+                      {/* Content Container */}
+                      <div className="relative z-10 space-y-4">
+                        
+                        {/* Header Badge */}
+                        <div className="flex items-center justify-between mb-2 pb-3 border-b" style={{ borderColor: 'rgba(30,41,59,0.8)' }}>
+                          <div className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-[#D6A85F] animate-pulse" />
+                            <span className="text-[11px] font-mono tracking-widest uppercase" style={{ color: '#A6A9AF' }}>LIVE NETWORK SYNC</span>
+                          </div>
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded border" style={{ borderColor: 'rgba(214,168,95,0.3)', color: '#D6A85F' }}>AI ACTIVE</span>
+                        </div>
+
+                        {/* CARD 1: Total Inventory */}
+                        <motion.div
+                          whileHover={{ y: -2 }}
+                          className="p-4 md:p-5 rounded-xl border backdrop-blur-md transition-all duration-300 flex items-center justify-between"
+                          style={{ backgroundColor: 'rgba(17,23,32,0.85)', borderColor: 'rgba(214,168,95,0.25)' }}
+                        >
+                          <div>
+                            <p className="text-[10px] font-bold tracking-[0.2em] uppercase mb-1" style={{ color: '#A6A9AF' }}>TOTAL INVENTORY</p>
+                            <p className="font-display text-2xl md:text-3xl font-bold tracking-tight" style={{ color: '#F5F3EE' }}>1,245,680</p>
+                            <p className="text-[11px] font-semibold mt-1" style={{ color: '#6FAF8F' }}>↑ 12.5% vs last month</p>
+                          </div>
+                          {/* Mini Line Chart */}
+                          <div className="w-20 h-10 flex items-end gap-1">
+                            {[40, 55, 35, 60, 75, 65, 90].map((h, idx) => (
+                              <div
+                                key={idx}
+                                className="w-2 rounded-t transition-all duration-500"
+                                style={{ height: `${h}%`, backgroundColor: idx === 6 ? '#D6A85F' : 'rgba(214,168,95,0.3)' }}
+                              />
+                            ))}
+                          </div>
+                        </motion.div>
+
+                        {/* CARD 2 & CARD 3 Row */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          
+                          {/* CARD 2: Accuracy Rate */}
+                          <motion.div
+                            whileHover={{ y: -2 }}
+                            className="p-4 rounded-xl border backdrop-blur-md transition-all duration-300"
+                            style={{ backgroundColor: 'rgba(17,23,32,0.85)', borderColor: 'rgba(30,41,59,0.8)' }}
+                          >
+                            <div className="flex justify-between items-start mb-2">
+                              <p className="text-[10px] font-bold tracking-[0.2em] uppercase" style={{ color: '#A6A9AF' }}>ACCURACY RATE</p>
+                              {/* Circular Progress Indicator */}
+                              <div className="w-7 h-7 rounded-full border-2 border-[#D6A85F] border-t-transparent flex items-center justify-center">
+                                <span className="text-[8px] font-bold" style={{ color: '#D6A85F' }}>99%</span>
+                              </div>
+                            </div>
+                            <p className="font-display text-xl font-bold" style={{ color: '#F5F3EE' }}>99.67%</p>
+                            <p className="text-[10px] font-semibold mt-1" style={{ color: '#6FAF8F' }}>↑ 2.3% vs last month</p>
+                          </motion.div>
+
+                          {/* CARD 3: Active Warehouses */}
+                          <motion.div
+                            whileHover={{ y: -2 }}
+                            className="p-4 rounded-xl border backdrop-blur-md transition-all duration-300"
+                            style={{ backgroundColor: 'rgba(17,23,32,0.85)', borderColor: 'rgba(30,41,59,0.8)' }}
+                          >
+                            <div className="flex justify-between items-start mb-2">
+                              <p className="text-[10px] font-bold tracking-[0.2em] uppercase" style={{ color: '#A6A9AF' }}>ACTIVE WAREHOUSES</p>
+                              <div className="w-7 h-7 rounded-full bg-[#D6A85F]/10 border border-[#D6A85F]/30 flex items-center justify-center">
+                                <Building2 className="w-3.5 h-3.5" style={{ color: '#D6A85F' }} />
+                              </div>
+                            </div>
+                            <p className="font-display text-xl font-bold" style={{ color: '#F5F3EE' }}>24</p>
+                            <p className="text-[10px] font-semibold mt-1 flex items-center gap-1" style={{ color: '#6FAF8F' }}>
+                              <span className="w-1.5 h-1.5 rounded-full bg-[#6FAF8F]" />
+                              Online & Syncing
+                            </p>
+                          </motion.div>
+                        </div>
+
+                      </div>
+                    </div>
+                  </RevealSection>
+                </div>
+
               </div>
+
+              {/* ── BOTTOM FEATURE CARDS (4 Interactive Cards) ── */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-28">
+                {[
+                  {
+                    tag: 'SEE IT.',
+                    title: 'Real-Time Visibility',
+                    desc: 'Real-time inventory visibility across every warehouse and location.',
+                    icon: Eye,
+                  },
+                  {
+                    tag: 'TRACK IT.',
+                    title: 'Precision Movement',
+                    desc: 'Track every inventory movement in real time with complete accuracy.',
+                    icon: Target,
+                  },
+                  {
+                    tag: 'RECONCILE IT.',
+                    title: 'Automated Sync',
+                    desc: 'Automated reconciliation to identify and eliminate inventory mismatches.',
+                    icon: RefreshCw,
+                  },
+                  {
+                    tag: 'OPTIMIZE IT.',
+                    title: 'Predictive Insights',
+                    desc: 'AI-powered insights to optimize stock, forecast demand and reduce costs.',
+                    icon: TrendingUp,
+                  },
+                ].map((card, i) => {
+                  const IconComp = card.icon;
+                  return (
+                    <RevealSection key={i} delay={0.1 * i}>
+                      <motion.div
+                        whileHover={{ y: -5 }}
+                        className="group p-8 rounded-2xl border transition-all duration-500 relative overflow-hidden flex flex-col justify-between h-full cursor-default"
+                        style={{
+                          backgroundColor: '#0B1017',
+                          borderColor: 'rgba(214,168,95,0.18)',
+                        }}
+                      >
+                        {/* Subtle hover gradient glow */}
+                        <div
+                          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                          style={{ background: 'radial-gradient(circle at top right, rgba(214,168,95,0.08), transparent 70%)' }}
+                        />
+
+                        <div>
+                          {/* Header Row: Icon & Circular Arrow */}
+                          <div className="flex items-center justify-between mb-8">
+                            <div className="w-12 h-12 rounded-xl bg-[#111720] border border-[#1E293B] flex items-center justify-center group-hover:border-[#D6A85F]/50 group-hover:bg-[#D6A85F]/10 transition-all duration-300">
+                              <IconComp className="w-5 h-5 text-[#A6A9AF] group-hover:text-[#D6A85F] transition-colors" />
+                            </div>
+                            <div className="w-8 h-8 rounded-full border border-[#1E293B] flex items-center justify-center group-hover:border-[#D6A85F] group-hover:bg-[#D6A85F] transition-all duration-300">
+                              <ArrowRight className="w-3.5 h-3.5 text-[#5A5D63] group-hover:text-[#050608] group-hover:translate-x-0.5 transition-all" />
+                            </div>
+                          </div>
+
+                          {/* Tag & Title */}
+                          <p className="text-xs font-bold tracking-[0.2em] uppercase mb-2" style={{ color: '#D6A85F' }}>
+                            {card.tag}
+                          </p>
+                          <h3 className="font-display text-xl mb-3 tracking-wide" style={{ color: '#F5F3EE' }}>
+                            {card.title}
+                          </h3>
+                          <p className="text-xs leading-relaxed" style={{ color: '#A6A9AF' }}>
+                            {card.desc}
+                          </p>
+                        </div>
+                      </motion.div>
+                    </RevealSection>
+                  );
+                })}
+              </div>
+
+              {/* ── BOTTOM BRAND MOMENT DIVIDER ── */}
+              <RevealSection>
+                <div className="pt-16 border-t flex flex-col items-center justify-center text-center" style={{ borderColor: '#1E293B' }}>
+                  {/* N Logo with thin gold circle */}
+                  <div className="w-12 h-12 rounded-full border border-[#D6A85F]/40 flex items-center justify-center mb-6 bg-[#0B1017]">
+                    <NexoraLogo className="w-6 h-6" />
+                  </div>
+                  <p className="text-[11px] font-bold tracking-[0.35em] uppercase" style={{ color: '#A6A9AF' }}>
+                    CONTROL EVERY STOCK. ACROSS EVERY WAREHOUSE.
+                  </p>
+                </div>
+              </RevealSection>
+
             </div>
           </section>
 
