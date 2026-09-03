@@ -1,0 +1,47 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: order-service
+  datasource:
+    url: jdbc:h2:file:./data/order_db;AUTO_SERVER=TRUE
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+  h2:
+    console:
+      enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+jwt:
+  public-key: "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvIDJcMm+p1B+0R8NTeIJN2lGQADP0lRWz5eZ2e9SBauOhGba27datc5Z52iqqOppfuThavTxd/Q40qeQXlCJ6RnTLdgnP9N1iCewi04f7s2iXKHP+opWfdmDjnn9WHUxKvcYhlYgfODyvE3XGJoLn44TDFD4jv/QRwzRWOE4sg7Ap5CCFIn2wrFIxmOZyjUmznITtvnAddMh7m1zK0sNrDUTMpstaZgHBsDvOh3dZDYv84fd4IpEnwGrZj6dHy4srLUXetazDylSEnbtpQts5EOpUu4K3Uv4pfPHau13pMJ9dvUnBuqrZIOmqAOXDP4IYMYgCrynEFor1XkvMPgb8QIDAQAB"
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      inventoryService:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 5s
+        failureRateThreshold: 50
+  retry:
+    instances:
+      inventoryService:
+        maxAttempts: 3
+        waitDuration: 1s
+  timelimiter:
+    instances:
+      inventoryService:
+        timeoutDuration: 3s

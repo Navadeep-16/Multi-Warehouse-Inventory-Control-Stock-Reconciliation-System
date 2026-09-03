@@ -1,0 +1,26 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: inventory-service
+  datasource:
+    url: jdbc:h2:file:./data/inventory_db;AUTO_SERVER=TRUE
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+  h2:
+    console:
+      enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+jwt:
+  public-key: "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvIDJcMm+p1B+0R8NTeIJN2lGQADP0lRWz5eZ2e9SBauOhGba27datc5Z52iqqOppfuThavTxd/Q40qeQXlCJ6RnTLdgnP9N1iCewi04f7s2iXKHP+opWfdmDjnn9WHUxKvcYhlYgfODyvE3XGJoLn44TDFD4jv/QRwzRWOE4sg7Ap5CCFIn2wrFIxmOZyjUmznITtvnAddMh7m1zK0sNrDUTMpstaZgHBsDvOh3dZDYv84fd4IpEnwGrZj6dHy4srLUXetazDylSEnbtpQts5EOpUu4K3Uv4pfPHau13pMJ9dvUnBuqrZIOmqAOXDP4IYMYgCrynEFor1XkvMPgb8QIDAQAB"

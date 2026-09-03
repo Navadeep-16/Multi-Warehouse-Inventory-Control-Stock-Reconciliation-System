@@ -1,0 +1,38 @@
+# Compiled Java / Maven artifacts
+target/
+**/target/
+*.class
+*.jar
+*.war
+*.ear
+apache-maven-*/
+maven.zip
+
+# Node / Frontend
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+build/
+**/build/
+.npm
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment & IDE
+.env
+.env.local
+.env.*.local
+.idea/
+.vscode/
+*.iml
+.project
+.classpath
+.settings/
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini

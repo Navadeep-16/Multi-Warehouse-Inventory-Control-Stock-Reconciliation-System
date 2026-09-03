@@ -1,0 +1,29 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: auth-service
+  datasource:
+    url: jdbc:h2:file:./data/auth_db;AUTO_SERVER=TRUE
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+  h2:
+    console:
+      enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+jwt:
+  private-key: "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC8gMlwyb6nUH7RHw1N4gk3aUZAAM/SVFbPl5nZ71IFq46EZtrbt1q1zlnnaKqo6ml+5OFq9PF39DjSp5BeUInpGdMt2Cc/03WIJ7CLTh/uzaJcoc/6ilZ92YOOef1YdTEq9xiGViB84PK8TdcYmgufjhMMUPiO/9BHDNFY4TiyDsCnkIIUifbCsUjGY5nKNSbOchO2+cB10yHubXMrSw2sNRMymy1pmAcGwO86Hd1kNi/zh93gikSfAatmPp0fLiystRd61rMPKVISdu2lC2zkQ6lS7grdS/il88dq7Xekwn129ScG6qtkg6aoA5cM/ghgxiAKvKcQWivVeS8w+BvxAgMBAAECggEAT/vVfaYc36GoLdOfMYzXnEtvI3k0tWpT64HIJlEF3KIOtt9tvgzu0HXeb/JZd5L/cHhtrZSBYQSfl8LB30MNQXtTwAAXp11yYXN11aYwpoNagTOnrAdG699/ktTwSrhvRGvUXCvvXQ2V8ZCV1DqI9Aq0ymUREpw5I+ysZ6opBGPDojnUzWJKMbN92wRdcI3AZnc1qrzMUIMrbTFF0qpPXqRWo870Uri6BYTbE2UP8L7ihufa/U1zd0jg4btc6uBVso6uUsDigE5x4IC19kaHBXjzw+DSkBKtJHNXgM1MoqDYSrBKQAYz+IUEHd8izncSQ2sl2OdKx975Ey+zSknWgQKBgQDg1h1VAZm5zchhS9wPL1AgB5v+IkZqelLjITz5e6MQBQJaqgtEeMeXReLolfY9YXxJHOiGwWY0tQY8YFRsLlzrX8lHUZBKe2zbWNOFe5VPGVdm1WL7EnMS4L/ZvoexEfqjzx8r771g0ChGDZsAgqUYUNOZ7lK0Ps6QeyIJQJD+VwKBgQDWoXRv4TwGkVvyPrT6W3RWIVpkOAdgdxY60jpQ/wwiGZzfWDKYy97BE6hnohdkTWp6q4Q4b8f+yLobQu4IhjNZSHZDVVLhWUBF+t3S4xYavHz3ZhS5Uk+kv056mOkKLspA83eEzyUnPYRbRiAcv7mOmm3fVbz9SMPdeANsskU69wKBgQCijIo2S+rs9wa4uRSG8ejWz0mLKRKJpphIV15y7F0OluCF1cxBm6SJDGCpUMnuxI0LetftnOMclgfFHMvMTpSlIuItKp3MC4G+73A1YAypXCPhV8KwzDzf2Bc8AFCvxtTTG0ppBHGBDd0gEHQQoWNkugLRlgi7AXFr6WnJEKIDDwKBgFQINKlVGwZLRR+MM5lN0zehqV1RnnnDRl3TT2fE48A6HPRI+M5gC5+2jZm9mcD4mnbazlK2WSxE9LCVvNJzkIklWMA2GNQH+KUtekoGBPKE17yZKAYC1xHeoOBZG+yTszZI3IOQArDhYf/Gbe4zlnfhuKDXVb4pDh6YzWZySa6zAoGABMvyTbpxcQkO6swibhKRszUeCc5Wd+cezdb+Rx5U/UwVly5Xn3ajlRItJcDBKTV6r5ZBoXTXG5zSdphsV7Hc1JWvoCQ1jHipKDQO/fbGUoPwgj0FICbRfvK57lce1yPkh13J80tAeWFr20O+Oxrjj0yge0Nmjt8DFPv4bpuCZlE="

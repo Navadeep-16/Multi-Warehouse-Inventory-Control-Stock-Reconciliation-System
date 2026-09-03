@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nexora - Real-Time Inventory Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              background: "var(--bg-primary)",
+              foreground: "var(--text-primary)",
+              surface: "var(--bg-surface)",
+              "surface-elevated": "var(--bg-surface-elevated)",
+              border: "var(--border-subtle)",
+              primary: { DEFAULT: "var(--accent-primary)", foreground: "#0A0E14" },
+              secondary: { DEFAULT: "var(--accent-secondary)", foreground: "#FFFFFF" },
+              warning: { DEFAULT: "var(--accent-warning)", foreground: "#FFFFFF" },
+              danger: { DEFAULT: "var(--accent-danger)", foreground: "#FFFFFF" },
+              success: { DEFAULT: "var(--accent-success)", foreground: "#FFFFFF" },
+              muted: { DEFAULT: "var(--text-muted)", foreground: "var(--text-muted)" },
+            },
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              heading: ['Space Grotesk', 'sans-serif'],
+              mono: ['IBM Plex Mono', 'monospace'],
+            }
+          }
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

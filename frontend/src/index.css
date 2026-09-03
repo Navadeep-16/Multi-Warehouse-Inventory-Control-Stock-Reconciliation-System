@@ -1,0 +1,105 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
+
+@layer base {
+  :root {
+    /* NEXORA Luxury-Tech Palette */
+    --bg-primary: #050608;
+    --bg-surface: #0B1017;
+    --bg-surface-elevated: #111720;
+    --bg-card: #161D2A;
+    --border-subtle: #1E293B;
+
+    /* Brand Accent - Champagne Gold */
+    --accent-primary: #D6A85F;
+    --accent-highlight: #F0C982;
+    --accent-steel: #64748B;
+
+    /* Typography */
+    --text-primary: #F5F3EE;
+    --text-secondary: #A6A9AF;
+    --text-muted: #5A5D63;
+
+    /* Semantic */
+    --accent-success: #6FAF8F;
+    --accent-warning: #C89A52;
+    --accent-danger: #C86B67;
+    --accent-info: #7B93AD;
+  }
+}
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: rgba(214, 168, 95, 0.2);
+    color: var(--text-primary);
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-subtle);
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-steel);
+  }
+}
+
+/* Utility Classes */
+.font-display {
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.font-editorial {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-weight: 400;
+}
+
+.text-gradient-gold {
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-highlight));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

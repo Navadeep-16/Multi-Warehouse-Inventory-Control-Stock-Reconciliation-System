@@ -1,0 +1,124 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: omnistock-postgres
+    environment:
+      POSTGRES_USER: omnistock
+      POSTGRES_PASSWORD: secret
+      POSTGRES_MULTIPLE_DATABASES: auth_db,product_db,inventory_db,order_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh
+    ports:
+      - "5432:5432"
+    networks:
+      - omnistock-network
+
+  discovery-service:
+    build:
+      context: .
+      dockerfile: discovery-service/Dockerfile
+    container_name: discovery-service
+    ports:
+      - "8761:8761"
+    networks:
+      - omnistock-network
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: auth-service/Dockerfile
+    container_name: auth-service
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+      - DB_HOST=postgres
+      - DB_USER=omnistock
+      - DB_PASSWORD=secret
+    ports:
+      - "8081:8081"
+    depends_on:
+      - postgres
+      - discovery-service
+    networks:
+      - omnistock-network
+
+  product-service:
+    build:
+      context: .
+      dockerfile: product-service/Dockerfile
+    container_name: product-service
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+      - DB_HOST=postgres
+      - DB_USER=omnistock
+      - DB_PASSWORD=secret
+    ports:
+      - "8082:8082"
+    depends_on:
+      - postgres
+      - discovery-service
+    networks:
+      - omnistock-network
+
+  inventory-service:
+    build:
+      context: .
+      dockerfile: inventory-service/Dockerfile
+    container_name: inventory-service
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+      - DB_HOST=postgres
+      - DB_USER=omnistock
+      - DB_PASSWORD=secret
+    ports:
+      - "8083:8083"
+    depends_on:
+      - postgres
+      - discovery-service
+    networks:
+      - omnistock-network
+
+  order-service:
+    build:
+      context: .
+      dockerfile: order-service/Dockerfile
+    container_name: order-service
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+      - DB_HOST=postgres
+      - DB_USER=omnistock
+      - DB_PASSWORD=secret
+    ports:
+      - "8084:8084"
+    depends_on:
+      - postgres
+      - discovery-service
+    networks:
+      - omnistock-network
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    container_name: api-gateway
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+    ports:
+      - "8080:8080"
+    depends_on:
+      - discovery-service
+      - auth-service
+      - product-service
+      - inventory-service
+      - order-service
+    networks:
+      - omnistock-network
+
+networks:
+  omnistock-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
