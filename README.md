@@ -1,6 +1,6 @@
-# OmniStock Retail
+# Nexora Retail
 
-OmniStock Retail is a full-stack Multi-Warehouse Inventory Control Platform built using a microservices architecture. It tracks stock across multiple warehouses, manages a product catalog, and orchestrates order placement with automatic stock decrementing using a Saga pattern.
+Nexora Retail is a full-stack Multi-Warehouse Inventory Control Platform built using a microservices architecture. It tracks stock across multiple warehouses, manages a product catalog, and orchestrates order placement with automatic stock decrementing using a Saga pattern.
 
 ## Architecture
 
