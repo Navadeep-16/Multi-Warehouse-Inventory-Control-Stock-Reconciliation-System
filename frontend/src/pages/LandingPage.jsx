@@ -660,69 +660,237 @@ export const LandingPage = () => {
             </div>
           </section>
 
-          {/* ══════════ WAREHOUSE NETWORK ══════════ */}
-          <section className="py-32 px-8 relative overflow-hidden" style={{ backgroundColor: '#0B1017' }}>
-            <div className="max-w-[1200px] mx-auto relative z-10">
-              <RevealSection>
-                <p className="text-xs font-semibold tracking-[0.3em] uppercase mb-6" style={{ color: '#D6A85F' }}>Global Network</p>
-                <h2 className="font-display text-[clamp(2rem,5vw,4.5rem)] leading-[1.05] tracking-[-0.03em] mb-20" style={{ color: '#F5F3EE' }}>
-                  ONE INVENTORY.<br />
-                  <span style={{ color: '#5A5D63' }}>EVERY LOCATION.</span>
-                </h2>
-              </RevealSection>
+          {/* ══════════ GLOBAL WAREHOUSE NETWORK SECTION (FINAL MICRO POLISHED) ══════════ */}
+          <section className="py-28 px-6 md:px-10 relative overflow-hidden" style={{ backgroundColor: '#050608' }}>
+            
+            {/* World Map Dotted Grid Background */}
+            <div className="absolute inset-0 opacity-[0.07] pointer-events-none" style={{
+              backgroundImage: `radial-gradient(circle at 1px 1px, #D6A85F 1px, transparent 0)`,
+              backgroundSize: '24px 24px',
+            }} />
+            <div
+              className="absolute top-1/2 right-1/4 -translate-y-1/2 w-[750px] h-[750px] rounded-full pointer-events-none opacity-[0.04]"
+              style={{ background: 'radial-gradient(circle, #D6A85F, transparent 70%)' }}
+            />
 
-              {/* Network Visualization */}
-              <div className="relative h-[500px] md:h-[600px]">
-                <svg className="absolute inset-0 w-full h-full">
-                  {[
-                    ['25%', '30%', '50%', '50%'],
-                    ['50%', '50%', '75%', '35%'],
-                    ['50%', '50%', '70%', '70%'],
-                    ['50%', '50%', '20%', '65%'],
-                    ['25%', '30%', '20%', '65%'],
-                  ].map(([x1, y1, x2, y2], i) => (
-                    <motion.line
-                      key={i}
-                      x1={x1} y1={y1} x2={x2} y2={y2}
-                      stroke="#D6A85F" strokeWidth="1" strokeOpacity="0.15"
-                      strokeDasharray="4 4"
-                      initial={{ pathLength: 0 }}
-                      whileInView={{ pathLength: 1 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 1.5, delay: 0.2 * i }}
-                    />
-                  ))}
-                </svg>
+            <div className="max-w-[1440px] mx-auto relative z-10">
+              
+              {/* ── TOP / MAIN GRID LAYOUT: Typography (Left) & Large Interactive Network (Right) ── */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
 
-                {[
-                  { name: 'Hyderabad', units: '12,400', capacity: '87%', x: '25%', y: '30%' },
-                  { name: 'Bangalore', units: '8,200', capacity: '72%', x: '50%', y: '50%' },
-                  { name: 'Chennai', units: '6,800', capacity: '65%', x: '75%', y: '35%' },
-                  { name: 'Mumbai', units: '15,600', capacity: '91%', x: '20%', y: '65%' },
-                  { name: 'Delhi', units: '10,300', capacity: '78%', x: '70%', y: '70%' },
-                ].map((wh, i) => (
-                  <RevealSection key={i} delay={0.3 + i * 0.15} className="absolute group cursor-default" style={{ left: wh.x, top: wh.y, transform: 'translate(-50%, -50%)' }}>
-                    <div className="relative">
-                      <div className="w-3 h-3 rounded-full shadow-[0_0_20px_rgba(214,168,95,0.4)]" style={{ backgroundColor: '#D6A85F' }} />
-                      <div className="absolute top-6 left-1/2 -translate-x-1/2 whitespace-nowrap">
-                        <div className="text-[10px] font-bold tracking-[0.2em] uppercase" style={{ color: '#A6A9AF' }}>{wh.name}</div>
-                        <div className="text-xs font-display mt-1" style={{ color: '#F5F3EE' }}>{wh.units} units</div>
+                {/* LEFT COLUMN: Eyebrow, Headline, Paragraph, CTA, Sync Status */}
+                <div className="lg:col-span-4 flex flex-col justify-between py-2">
+                  <div>
+                    {/* Eyebrow */}
+                    <div className="flex items-center gap-3 mb-6">
+                      <span className="h-[1px] w-8 bg-[#D6A85F]" />
+                      <p className="text-xs font-semibold tracking-[0.3em] uppercase" style={{ color: '#D6A85F' }}>
+                        GLOBAL NETWORK
+                      </p>
+                    </div>
+
+                    {/* Headline */}
+                    <h2 className="font-display text-[clamp(2.5rem,4.2vw,4.5rem)] leading-[0.96] tracking-[-0.03em] mb-6">
+                      <span className="block" style={{ color: '#F5F3EE' }}>ONE INVENTORY.</span>
+                      <span className="block" style={{ color: '#5A5D63' }}>EVERY LOCATION.</span>
+                    </h2>
+
+                    {/* Paragraph */}
+                    <p className="text-sm leading-relaxed mb-8 max-w-xs" style={{ color: '#A6A9AF' }}>
+                      Connect every warehouse, location and inventory movement through one intelligent network.
+                    </p>
+
+                    {/* Explore Network CTA Button */}
+                    <button
+                      onClick={() => navigate('/login')}
+                      className="group inline-flex items-center gap-3 text-xs font-semibold tracking-[0.18em] uppercase px-6 py-3.5 rounded-lg border transition-all duration-300 hover:border-[#D6A85F] hover:bg-[#D6A85F]/10 mb-8"
+                      style={{ borderColor: 'rgba(214,168,95,0.3)', color: '#D6A85F' }}
+                    >
+                      Explore Network
+                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                  </div>
+
+                  {/* Sub-badge: Live Network Sync */}
+                  <div className="flex items-start gap-3 pt-4 border-t" style={{ borderColor: 'rgba(30,41,59,0.7)' }}>
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#D6A85F] animate-pulse mt-1 shrink-0" />
+                    <div>
+                      <p className="text-[11px] font-bold tracking-wider uppercase" style={{ color: '#F5F3EE' }}>
+                        LIVE NETWORK SYNC
+                      </p>
+                      <p className="text-[11px]" style={{ color: '#5A5D63' }}>
+                        All locations are connected and synchronized in real time.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* RIGHT/CENTER: Large Interactive Network Map Canvas + Right Network Status Panel */}
+                <div className="lg:col-span-8 grid grid-cols-1 lg:grid-cols-12 gap-5 items-center">
+
+                  {/* Seamless Floating Network Diagram Container (Enlarged + 30% Border Opacity Reduction) */}
+                  <div className="lg:col-span-9 relative h-[570px] rounded-2xl border p-4 overflow-hidden"
+                    style={{ backgroundColor: 'transparent', borderColor: 'rgba(30,41,59,0.18)' }}>
+                    
+                    {/* Ambient Glow behind Central Hub */}
+                    <div className="absolute top-[48%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full pointer-events-none opacity-25"
+                      style={{ background: 'radial-gradient(circle, #D6A85F 0%, transparent 70%)' }} />
+
+                    {/* SVG Connection Lines & Flowing Particles */}
+                    <svg className="absolute inset-0 w-full h-full pointer-events-none">
+                      {[
+                        { from: [50, 14], to: [26, 38] },
+                        { from: [50, 14], to: [50, 48] },
+                        { from: [50, 14], to: [76, 44] },
+                        { from: [26, 38], to: [50, 48] },
+                        { from: [50, 48], to: [76, 44] },
+                        { from: [50, 48], to: [46, 80] },
+                        { from: [50, 48], to: [74, 78] },
+                        { from: [46, 80], to: [74, 78] },
+                      ].map((route, i) => (
+                        <g key={i}>
+                          <line
+                            x1={`${route.from[0]}%`} y1={`${route.from[1]}%`}
+                            x2={`${route.to[0]}%`} y2={`${route.to[1]}%`}
+                            stroke="#D6A85F" strokeWidth="1.2" strokeOpacity="0.25"
+                            strokeDasharray="4 4"
+                          />
+                          {!prefersReducedMotion && (
+                            <motion.circle
+                              r="2.5" fill="#D6A85F"
+                              animate={{
+                                cx: [`${route.from[0]}%`, `${route.to[0]}%`],
+                                cy: [`${route.from[1]}%`, `${route.to[1]}%`],
+                                opacity: [0, 1, 0],
+                              }}
+                              transition={{
+                                duration: 3.8 + i * 0.5,
+                                repeat: Infinity,
+                                ease: 'easeInOut',
+                                delay: i * 0.4,
+                              }}
+                            />
+                          )}
+                        </g>
+                      ))}
+                    </svg>
+
+                    {/* Floating UI Annotation Badges */}
+                    <div className="absolute top-[26%] left-[36%] z-20 pointer-events-none">
+                      <div className="px-2 py-0.5 rounded border text-[9px] font-mono whitespace-nowrap backdrop-blur-md"
+                        style={{ backgroundColor: 'rgba(11,16,23,0.92)', borderColor: 'rgba(214,168,95,0.4)', color: '#D6A85F' }}>
+                        <span className="text-[8px] text-[#A6A9AF] mr-1">STOCK TRANSFER</span>
+                        12,450 UNITS
                       </div>
-                      {/* Hover card */}
-                      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none">
-                        <div className="p-4 rounded-xl border min-w-[180px]" style={{ backgroundColor: '#111720', borderColor: '#1E293B' }}>
-                          <div className="text-xs font-bold tracking-wider uppercase mb-2" style={{ color: '#D6A85F' }}>{wh.name}</div>
-                          <div className="space-y-1.5 text-[11px]" style={{ color: '#A6A9AF' }}>
-                            <div className="flex justify-between"><span>Stock</span><span style={{ color: '#F5F3EE' }}>{wh.units}</span></div>
-                            <div className="flex justify-between"><span>Capacity</span><span style={{ color: '#F5F3EE' }}>{wh.capacity}</span></div>
-                            <div className="flex justify-between"><span>Transfers</span><span style={{ color: '#6FAF8F' }}>Active</span></div>
+                    </div>
+
+                    <div className="absolute top-[20%] right-[16%] z-20 pointer-events-none">
+                      <div className="px-2 py-0.5 rounded border text-[9px] font-mono whitespace-nowrap backdrop-blur-md"
+                        style={{ backgroundColor: 'rgba(11,16,23,0.92)', borderColor: 'rgba(30,41,59,0.8)', color: '#6FAF8F' }}>
+                        <span className="text-[8px] text-[#A6A9AF] mr-1">SYNC COMPLETE</span>
+                        99.8%
+                      </div>
+                    </div>
+
+                    <div className="absolute bottom-[34%] left-[32%] z-20 pointer-events-none">
+                      <div className="px-2 py-0.5 rounded border text-[9px] font-mono whitespace-nowrap backdrop-blur-md"
+                        style={{ backgroundColor: 'rgba(11,16,23,0.92)', borderColor: 'rgba(30,41,59,0.8)', color: '#F0C982' }}>
+                        <span className="text-[8px] text-[#A6A9AF] mr-1">IN TRANSIT</span>
+                        8,350 UNITS
+                      </div>
+                    </div>
+
+                    {/* Warehouse Nodes (Optimized Alignment & Scale) */}
+                    {[
+                      { id: 'north', name: 'NORTH HUB', city: 'Delhi NCR', units: '214,680', x: '50%', y: '14%', align: '-translate-x-1/2', isCentral: false },
+                      { id: 'west', name: 'WEST HUB', city: 'Mumbai', units: '186,240', x: '26%', y: '38%', align: '-translate-x-1/2', isCentral: false },
+                      { id: 'central', name: 'CENTRAL HUB', city: 'Hyderabad', units: '428,520', x: '50%', y: '48%', align: '-translate-x-1/2', isCentral: true },
+                      { id: 'east', name: 'EAST HUB', city: 'Kolkata', units: '152,310', x: '76%', y: '44%', align: '-translate-x-1/2', isCentral: false },
+                      { id: 'south', name: 'SOUTH HUB', city: 'Bengaluru', units: '213,930', x: '46%', y: '80%', align: '-translate-x-1/2', isCentral: false },
+                      { id: 'midwest', name: 'MID WEST HUB', city: 'Pune', units: '98,720', x: '74%', y: '78%', align: '-translate-x-1/2', isCentral: false },
+                    ].map((wh) => (
+                      <motion.div
+                        key={wh.id}
+                        className={`absolute ${wh.align} group cursor-pointer z-30`}
+                        style={{ left: wh.x, top: wh.y }}
+                        whileHover={{ scale: 1.05 }}
+                      >
+                        <div className="relative flex flex-col items-center">
+                          {/* Central & Node Pulse Ring */}
+                          <div className="relative mb-1 flex items-center justify-center">
+                            <div className={`rounded-full border-2 border-[#D6A85F] bg-[#050608] flex items-center justify-center shadow-[0_0_15px_rgba(214,168,95,0.4)] ${wh.isCentral ? 'w-6 h-6' : 'w-5 h-5'}`}>
+                              <div className={`rounded-full bg-[#D6A85F] ${wh.isCentral ? 'w-2.5 h-2.5' : 'w-2 h-2'}`} />
+                            </div>
+                            <div className={`absolute inset-0 rounded-full border border-[#D6A85F] opacity-20 ${wh.isCentral ? 'w-12 h-12 -top-3 -left-3 animate-ping' : 'animate-ping'}`} />
                           </div>
+
+                          <div className={`px-3 py-1.5 rounded-xl border backdrop-blur-md transition-all duration-300 text-center ${wh.isCentral ? 'min-w-[130px] border-[#D6A85F]/50 bg-[#0B1017]/95' : 'min-w-[110px] border-[#D6A85F]/30 bg-[#0B1017]/90'}`}>
+                            <p className="text-[9px] font-bold tracking-wider uppercase text-[#F5F3EE]">{wh.name}</p>
+                            <p className="text-[8px] text-[#A6A9AF] mb-0.5">{wh.city}</p>
+                            <p className={`font-display font-bold text-[#D6A85F] ${wh.isCentral ? 'text-sm' : 'text-xs'}`}>{wh.units}</p>
+                            <p className="text-[8px] font-semibold text-[#6FAF8F] flex items-center justify-center gap-1 mt-0.5">
+                              <span className="w-1 h-1 rounded-full bg-[#6FAF8F]" />
+                              ONLINE
+                            </p>
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  {/* RIGHT PANEL: Network Status Metrics Panel */}
+                  <div className="lg:col-span-3">
+                    <div className="p-5 rounded-2xl border backdrop-blur-md space-y-5" style={{ backgroundColor: '#0B1017', borderColor: '#1E293B' }}>
+                      <div className="border-b pb-2.5" style={{ borderColor: 'rgba(30,41,59,0.8)' }}>
+                        <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-[#D6A85F]">NETWORK STATUS</p>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-[#111720] border border-[#1E293B] flex items-center justify-center shrink-0">
+                          <Building2 className="w-4 h-4 text-[#D6A85F]" />
+                        </div>
+                        <div>
+                          <p className="font-display text-xl font-bold text-[#F5F3EE]">24</p>
+                          <p className="text-[8px] font-bold tracking-widest uppercase text-[#A6A9AF]">WAREHOUSES</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-[#111720] border border-[#1E293B] flex items-center justify-center shrink-0">
+                          <Eye className="w-4 h-4 text-[#D6A85F]" />
+                        </div>
+                        <div>
+                          <p className="font-display text-xl font-bold text-[#F5F3EE]">12.4M</p>
+                          <p className="text-[8px] font-bold tracking-widest uppercase text-[#A6A9AF]">UNITS TRACKED</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-[#111720] border border-[#1E293B] flex items-center justify-center shrink-0">
+                          <RefreshCw className="w-4 h-4 text-[#D6A85F]" />
+                        </div>
+                        <div>
+                          <p className="font-display text-xl font-bold text-[#F5F3EE]">148</p>
+                          <p className="text-[8px] font-bold tracking-widest uppercase text-[#A6A9AF]">ACTIVE TRANSFERS</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-[#111720] border border-[#1E293B] flex items-center justify-center shrink-0">
+                          <Target className="w-4 h-4 text-[#D6A85F]" />
+                        </div>
+                        <div>
+                          <p className="font-display text-xl font-bold text-[#F5F3EE]">99.67%</p>
+                          <p className="text-[8px] font-bold tracking-widest uppercase text-[#A6A9AF]">NETWORK ACCURACY</p>
                         </div>
                       </div>
                     </div>
-                  </RevealSection>
-                ))}
+                  </div>
+
+                </div>
+
               </div>
+
             </div>
           </section>
 
