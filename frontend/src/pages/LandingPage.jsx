@@ -3,6 +3,7 @@ import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'fra
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Play } from 'lucide-react';
 import { CinematicIntro, NexoraLogo } from '../components/CinematicIntro';
+import illuminatedWarehouseBg from '../assets/nexora_warehouse_illuminated.jpg';
 
 /* ─── Reusable Animated Section ─── */
 const RevealSection = ({ children, className = '', delay = 0 }) => {
@@ -83,12 +84,35 @@ export const LandingPage = () => {
   const heroY = useTransform(scrollYProgress, [0, 0.1], [0, -120]);
   const heroScale = useTransform(scrollYProgress, [0, 0.1], [1, 0.95]);
   const [navSolid, setNavSolid] = useState(false);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
     const handler = () => setNavSolid(window.scrollY > 80);
     window.addEventListener('scroll', handler, { passive: true });
     return () => window.removeEventListener('scroll', handler);
   }, []);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+    const handler = (e) => setPrefersReducedMotion(e.matches);
+    mediaQuery.addEventListener('change', handler);
+    return () => mediaQuery.removeEventListener('change', handler);
+  }, []);
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (prefersReducedMotion || window.innerWidth < 768) return;
+      const { clientX, clientY } = e;
+      const x = (clientX / window.innerWidth - 0.5) * 10; // Max 10px
+      const y = (clientY / window.innerHeight - 0.5) * 10;
+      setMousePos({ x, y });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, [prefersReducedMotion]);
 
   return (
     <>
@@ -136,95 +160,249 @@ export const LandingPage = () => {
             </div>
           </nav>
 
-          {/* ══════════ HERO ══════════ */}
+          {/* ══════════ HERO (ILLUMINATED CINEMATIC MOVING WAREHOUSE) ══════════ */}
           <motion.section
             style={{ opacity: heroOpacity, y: heroY, scale: heroScale }}
             className="relative min-h-screen flex items-center justify-center px-8 overflow-hidden"
           >
-            {/* Subtle ambient */}
-            <div className="absolute inset-0 opacity-[0.03]" style={{
-              backgroundImage: `radial-gradient(circle at 1px 1px, rgba(214,168,95,0.4) 1px, transparent 0)`,
-              backgroundSize: '60px 60px',
-            }} />
-            <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full opacity-[0.06]"
-              style={{ background: 'radial-gradient(circle, #D6A85F, transparent 70%)' }} />
-
-            <div className="max-w-[1200px] mx-auto w-full pt-32 pb-20">
-              <div className="mb-20">
-                <div className="overflow-hidden mb-2">
-                  <motion.div
-                    initial={{ y: '100%' }}
-                    animate={{ y: 0 }}
-                    transition={{ duration: 1, delay: 0.2, ease: [0.33, 1, 0.68, 1] }}
-                    className="font-display text-[clamp(3rem,10vw,9rem)] leading-[0.9] tracking-[-0.04em]"
-                    style={{ color: '#F5F3EE' }}
-                  >
-                    CONTROL
-                  </motion.div>
-                </div>
-                <div className="overflow-hidden mb-2">
-                  <motion.div
-                    initial={{ y: '100%' }}
-                    animate={{ y: 0 }}
-                    transition={{ duration: 1, delay: 0.35, ease: [0.33, 1, 0.68, 1] }}
-                    className="font-display text-[clamp(3rem,10vw,9rem)] leading-[0.9] tracking-[-0.04em]"
-                    style={{ color: '#F5F3EE' }}
-                  >
-                    EVERY STOCK.
-                  </motion.div>
-                </div>
-                <div className="h-6" />
-                <div className="overflow-hidden mb-2">
-                  <motion.div
-                    initial={{ y: '100%' }}
-                    animate={{ y: 0 }}
-                    transition={{ duration: 1, delay: 0.5, ease: [0.33, 1, 0.68, 1] }}
-                    className="font-display text-[clamp(3rem,10vw,9rem)] leading-[0.9] tracking-[-0.04em]"
-                    style={{ color: '#A6A9AF' }}
-                  >
-                    ACROSS
-                  </motion.div>
-                </div>
-                <div className="overflow-hidden">
-                  <motion.div
-                    initial={{ y: '100%' }}
-                    animate={{ y: 0 }}
-                    transition={{ duration: 1, delay: 0.65, ease: [0.33, 1, 0.68, 1] }}
-                    className="text-[clamp(3rem,10vw,9rem)] leading-[0.9] tracking-[-0.04em]"
-                  >
-                    <span className="font-display" style={{ color: '#A6A9AF' }}>EVERY </span>
-                    <span className="font-editorial text-gradient-gold">Warehouse.</span>
-                  </motion.div>
-                </div>
-              </div>
-
+            {/* ── ILLUMINATED CINEMATIC MOVING WAREHOUSE BACKGROUND ── */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+              {/* Layer 1: Slow Seamless Camera Push Background Image */}
               <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1, delay: 1 }}
-                className="max-w-xl"
-              >
-                <p className="text-lg leading-relaxed mb-10" style={{ color: '#A6A9AF' }}>
-                  NEXORA is an intelligent multi-warehouse inventory platform designed to help organizations track, transfer, reconcile and optimize inventory across their entire supply chain.
-                </p>
+                className="absolute inset-0 w-full h-full bg-cover bg-center opacity-95"
+                style={{
+                  backgroundImage: `url(${illuminatedWarehouseBg})`,
+                  filter: 'brightness(1.10) contrast(1.04)',
+                  willChange: 'transform',
+                }}
+                animate={
+                  prefersReducedMotion
+                    ? {}
+                    : {
+                        scale: [1.02, 1.08, 1.02],
+                        x: [mousePos.x * -0.5, mousePos.x * -0.5 + 4, mousePos.x * -0.5],
+                        y: [mousePos.y * -0.5, mousePos.y * -0.5 - 8, mousePos.y * -0.5],
+                      }
+                }
+                transition={{
+                  duration: 18,
+                  repeat: Infinity,
+                  repeatType: 'reverse',
+                  ease: 'easeInOut',
+                }}
+              />
 
-                <div className="flex items-center gap-6">
-                  <button
-                    onClick={() => navigate('/login')}
-                    className="group flex items-center gap-3 text-sm font-semibold tracking-wider px-7 py-4 rounded-lg transition-all duration-300 hover:shadow-[0_0_30px_rgba(214,168,95,0.3)]"
-                    style={{ backgroundColor: '#D6A85F', color: '#050608' }}
-                  >
-                    Explore NEXORA
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </button>
-                  <button className="group flex items-center gap-3 text-sm tracking-wider transition-colors hover:text-[#F5F3EE]" style={{ color: '#A6A9AF' }}>
-                    <div className="w-10 h-10 rounded-full border flex items-center justify-center group-hover:border-[#D6A85F] transition-colors" style={{ borderColor: '#1E293B' }}>
-                      <Play className="w-3.5 h-3.5 ml-0.5" />
-                    </div>
-                    Watch the experience
-                  </button>
+              {/* Layer 2: Atmospheric Dust Motes Floating in Overhead Light Beams */}
+              {!prefersReducedMotion && (
+                <div className="absolute inset-0 opacity-45">
+                  {Array.from({ length: 24 }).map((_, i) => (
+                    <motion.div
+                      key={i}
+                      className="absolute rounded-full"
+                      style={{
+                        left: `${18 + (i * 3.2)}%`,
+                        top: `${10 + (i % 5) * 14}%`,
+                        width: `${2 + (i % 3) * 2}px`,
+                        height: `${2 + (i % 3) * 2}px`,
+                        backgroundColor: '#D6A85F',
+                        filter: 'blur(1px)',
+                      }}
+                      animate={{
+                        y: [-25, 25, -25],
+                        x: [-12, 12, -12],
+                        opacity: [0.2, 0.7, 0.2],
+                      }}
+                      transition={{
+                        duration: 6 + (i % 4) * 2,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                        delay: i * 0.2,
+                      }}
+                    />
+                  ))}
                 </div>
-              </motion.div>
+              )}
+
+              {/* Layer 3: Autonomous AGV Warehouse Robot Driving Down Central Aisle */}
+              {!prefersReducedMotion && (
+                <motion.div
+                  className="absolute bottom-[23%] left-[27%] flex items-center gap-1 opacity-80"
+                  animate={{
+                    x: [-30, 45, -30],
+                    y: [0, -3, 0],
+                    scale: [0.95, 1.05, 0.95],
+                  }}
+                  transition={{
+                    duration: 10,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                  }}
+                >
+                  <div className="w-20 h-1.5 rounded-full shadow-[0_0_20px_#D6A85F]" style={{ backgroundColor: '#D6A85F' }} />
+                  <div className="w-2 h-2 rounded-full animate-ping" style={{ backgroundColor: '#F0C982' }} />
+                </motion.div>
+              )}
+
+              {/* Layer 4: Forklift Headlight Sweeping Reflection in Midground Aisle */}
+              {!prefersReducedMotion && (
+                <motion.div
+                  className="absolute bottom-[28%] right-[30%] opacity-70 pointer-events-none"
+                  animate={{
+                    x: [40, -40, 40],
+                    opacity: [0.3, 0.75, 0.3],
+                  }}
+                  transition={{
+                    duration: 12,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                    delay: 1,
+                  }}
+                >
+                  <div className="w-28 h-2 rounded-full blur-[2px] shadow-[0_0_25px_#F0C982]" style={{ backgroundColor: 'rgba(240,201,130,0.5)' }} />
+                </motion.div>
+              )}
+
+              {/* Layer 5: Distant Warehouse Workers Silhouette Activity */}
+              {!prefersReducedMotion && (
+                <div className="absolute top-[48%] left-[50%] -translate-x-1/2 flex items-center gap-4 opacity-40">
+                  <motion.div
+                    className="w-1.5 h-3 bg-[#F0C982] rounded-xs"
+                    animate={{ x: [-15, 15, -15], opacity: [0.3, 0.7, 0.3] }}
+                    transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+                  />
+                  <motion.div
+                    className="w-1.5 h-3 bg-[#D6A85F] rounded-xs"
+                    animate={{ x: [10, -10, 10], opacity: [0.4, 0.8, 0.4] }}
+                    transition={{ duration: 9.5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+                  />
+                </div>
+              )}
+
+              {/* Layer 6: Automated Conveyor Belt Package Movement */}
+              {!prefersReducedMotion && (
+                <div className="absolute top-[55%] right-[15%] w-32 h-1 overflow-hidden opacity-35">
+                  <motion.div
+                    className="flex gap-4 w-[200%]"
+                    animate={{ x: ['0%', '-50%'] }}
+                    transition={{ duration: 6, repeat: Infinity, ease: 'linear' }}
+                  >
+                    {Array.from({ length: 6 }).map((_, i) => (
+                      <div key={i} className="w-3 h-1 bg-[#D6A85F] rounded-xs" />
+                    ))}
+                  </motion.div>
+                </div>
+              )}
+
+              {/* Layer 7: Environmental Light & Floor Reflection Shimmer */}
+              {!prefersReducedMotion && (
+                <motion.div
+                  className="absolute inset-0 pointer-events-none opacity-20"
+                  style={{
+                    background: 'radial-gradient(circle at 50% 60%, rgba(214,168,95,0.4) 0%, transparent 60%)',
+                  }}
+                  animate={{
+                    opacity: [0.15, 0.3, 0.15],
+                  }}
+                  transition={{
+                    duration: 5,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                  }}
+                />
+              )}
+
+              {/* Layer 8: Selective Vignette Overlay (10-15% Brighter Center-Right Aisle, Crisp Left Text Backdrop) */}
+              <div
+                className="absolute inset-0"
+                style={{
+                  background: `
+                    radial-gradient(ellipse at 65% 48%, rgba(5,6,8,0.0) 0%, rgba(5,6,8,0.3) 55%, rgba(5,6,8,0.85) 100%),
+                    radial-gradient(ellipse at 15% 50%, rgba(5,6,8,0.82) 0%, rgba(5,6,8,0.45) 60%, transparent 100%),
+                    linear-gradient(to bottom, rgba(5,6,8,0.55) 0%, transparent 35%, rgba(5,6,8,0.8) 85%, #050608 100%)
+                  `,
+                }}
+              />
+            </div>
+
+            {/* ── HERO CONTENT (Balanced Composition: Left Headline, Open Right Warehouse View) ── */}
+            <div className="relative z-10 max-w-[1400px] mx-auto w-full pt-32 pb-20 flex flex-col justify-center">
+              <div className="max-w-2xl lg:max-w-3xl">
+                <div className="mb-12">
+                  <div className="overflow-hidden mb-2">
+                    <motion.div
+                      initial={{ y: '100%' }}
+                      animate={{ y: 0 }}
+                      transition={{ duration: 1, delay: 0.2, ease: [0.33, 1, 0.68, 1] }}
+                      className="font-display text-[clamp(2.5rem,6.5vw,5.5rem)] leading-[0.95] tracking-[-0.04em]"
+                      style={{ color: '#F5F3EE' }}
+                    >
+                      CONTROL
+                    </motion.div>
+                  </div>
+                  <div className="overflow-hidden mb-2">
+                    <motion.div
+                      initial={{ y: '100%' }}
+                      animate={{ y: 0 }}
+                      transition={{ duration: 1, delay: 0.35, ease: [0.33, 1, 0.68, 1] }}
+                      className="font-display text-[clamp(2.5rem,6.5vw,5.5rem)] leading-[0.95] tracking-[-0.04em]"
+                      style={{ color: '#F5F3EE' }}
+                    >
+                      EVERY STOCK.
+                    </motion.div>
+                  </div>
+                  <div className="h-4" />
+                  <div className="overflow-hidden mb-2">
+                    <motion.div
+                      initial={{ y: '100%' }}
+                      animate={{ y: 0 }}
+                      transition={{ duration: 1, delay: 0.5, ease: [0.33, 1, 0.68, 1] }}
+                      className="font-display text-[clamp(2.5rem,6.5vw,5.5rem)] leading-[0.95] tracking-[-0.04em]"
+                      style={{ color: '#A6A9AF' }}
+                    >
+                      ACROSS
+                    </motion.div>
+                  </div>
+                  <div className="overflow-hidden">
+                    <motion.div
+                      initial={{ y: '100%' }}
+                      animate={{ y: 0 }}
+                      transition={{ duration: 1, delay: 0.65, ease: [0.33, 1, 0.68, 1] }}
+                      className="text-[clamp(2.5rem,6.5vw,5.5rem)] leading-[0.95] tracking-[-0.04em]"
+                    >
+                      <span className="font-display" style={{ color: '#A6A9AF' }}>EVERY </span>
+                      <span className="font-editorial text-gradient-gold">Warehouse.</span>
+                    </motion.div>
+                  </div>
+                </div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 1, delay: 1 }}
+                  className="max-w-xl"
+                >
+                  <p className="text-base md:text-lg leading-relaxed mb-10" style={{ color: '#A6A9AF' }}>
+                    NEXORA is an intelligent multi-warehouse inventory platform designed to help organizations track, transfer, reconcile and optimize inventory across their entire supply chain.
+                  </p>
+
+                  <div className="flex items-center gap-6">
+                    <button
+                      onClick={() => navigate('/login')}
+                      className="group flex items-center gap-3 text-sm font-semibold tracking-wider px-7 py-4 rounded-lg transition-all duration-300 hover:shadow-[0_0_30px_rgba(214,168,95,0.3)]"
+                      style={{ backgroundColor: '#D6A85F', color: '#050608' }}
+                    >
+                      Explore NEXORA
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                    <button className="group flex items-center gap-3 text-sm tracking-wider transition-colors hover:text-[#F5F3EE]" style={{ color: '#A6A9AF' }}>
+                      <div className="w-10 h-10 rounded-full border flex items-center justify-center group-hover:border-[#D6A85F] transition-colors" style={{ borderColor: '#1E293B' }}>
+                        <Play className="w-3.5 h-3.5 ml-0.5" />
+                      </div>
+                      Watch the experience
+                    </button>
+                  </div>
+                </motion.div>
+              </div>
             </div>
           </motion.section>
 
