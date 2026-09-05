@@ -728,9 +728,9 @@ export const LandingPage = () => {
                 {/* RIGHT/CENTER: Large Interactive Network Map Canvas + Right Network Status Panel */}
                 <div className="lg:col-span-8 grid grid-cols-1 lg:grid-cols-12 gap-5 items-center">
 
-                  {/* Seamless Floating Network Diagram Container (Enlarged + 30% Border Opacity Reduction) */}
+                  {/* Seamless Floating Network Diagram Container (15-20% Border Opacity Reduction) */}
                   <div className="lg:col-span-9 relative h-[570px] rounded-2xl border p-4 overflow-hidden"
-                    style={{ backgroundColor: 'transparent', borderColor: 'rgba(30,41,59,0.18)' }}>
+                    style={{ backgroundColor: 'transparent', borderColor: 'rgba(30,41,59,0.12)' }}>
                     
                     {/* Ambient Glow behind Central Hub */}
                     <div className="absolute top-[48%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full pointer-events-none opacity-25"
@@ -764,10 +764,10 @@ export const LandingPage = () => {
                                 opacity: [0, 1, 0],
                               }}
                               transition={{
-                                duration: 3.8 + i * 0.5,
+                                duration: 4 + (i % 3) * 0.8,
                                 repeat: Infinity,
                                 ease: 'easeInOut',
-                                delay: i * 0.4,
+                                delay: i * 0.5,
                               }}
                             />
                           )}
@@ -800,7 +800,7 @@ export const LandingPage = () => {
                       </div>
                     </div>
 
-                    {/* Warehouse Nodes (Optimized Alignment & Scale) */}
+                    {/* Warehouse Nodes (Optimized Alignment & Subtle Real-Time Activity Motion) */}
                     {[
                       { id: 'north', name: 'NORTH HUB', city: 'Delhi NCR', units: '214,680', x: '50%', y: '14%', align: '-translate-x-1/2', isCentral: false },
                       { id: 'west', name: 'WEST HUB', city: 'Mumbai', units: '186,240', x: '26%', y: '38%', align: '-translate-x-1/2', isCentral: false },
@@ -808,7 +808,7 @@ export const LandingPage = () => {
                       { id: 'east', name: 'EAST HUB', city: 'Kolkata', units: '152,310', x: '76%', y: '44%', align: '-translate-x-1/2', isCentral: false },
                       { id: 'south', name: 'SOUTH HUB', city: 'Bengaluru', units: '213,930', x: '46%', y: '80%', align: '-translate-x-1/2', isCentral: false },
                       { id: 'midwest', name: 'MID WEST HUB', city: 'Pune', units: '98,720', x: '74%', y: '78%', align: '-translate-x-1/2', isCentral: false },
-                    ].map((wh) => (
+                    ].map((wh, idx) => (
                       <motion.div
                         key={wh.id}
                         className={`absolute ${wh.align} group cursor-pointer z-30`}
@@ -821,7 +821,25 @@ export const LandingPage = () => {
                             <div className={`rounded-full border-2 border-[#D6A85F] bg-[#050608] flex items-center justify-center shadow-[0_0_15px_rgba(214,168,95,0.4)] ${wh.isCentral ? 'w-6 h-6' : 'w-5 h-5'}`}>
                               <div className={`rounded-full bg-[#D6A85F] ${wh.isCentral ? 'w-2.5 h-2.5' : 'w-2 h-2'}`} />
                             </div>
-                            <div className={`absolute inset-0 rounded-full border border-[#D6A85F] opacity-20 ${wh.isCentral ? 'w-12 h-12 -top-3 -left-3 animate-ping' : 'animate-ping'}`} />
+                            {wh.isCentral ? (
+                              <div className="absolute inset-0 rounded-full border border-[#D6A85F] opacity-25 w-12 h-12 -top-3 -left-3 animate-ping pointer-events-none" />
+                            ) : (
+                              !prefersReducedMotion && (
+                                <motion.div
+                                  className="absolute inset-0 rounded-full border border-[#D6A85F] pointer-events-none"
+                                  animate={{
+                                    scale: [1, 1.35, 1],
+                                    opacity: [0.1, 0.45, 0.1],
+                                  }}
+                                  transition={{
+                                    duration: 4,
+                                    repeat: Infinity,
+                                    ease: 'easeInOut',
+                                    delay: idx * 0.8,
+                                  }}
+                                />
+                              )
+                            )}
                           </div>
 
                           <div className={`px-3 py-1.5 rounded-xl border backdrop-blur-md transition-all duration-300 text-center ${wh.isCentral ? 'min-w-[130px] border-[#D6A85F]/50 bg-[#0B1017]/95' : 'min-w-[110px] border-[#D6A85F]/30 bg-[#0B1017]/90'}`}>
