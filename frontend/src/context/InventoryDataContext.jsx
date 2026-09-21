@@ -977,6 +977,21 @@ export const InventoryDataProvider = ({ children }) => {
         name: newProd.name,
         category: newProd.category,
         warehouse: 'WH-EAST',
+        warehouseId: 1,
+        available: newProd.stock,
+        reserved: 0,
+        reorder: 20,
+        unitCost: newProd.unitCost,
+        unitPrice: newProd.unitPrice,
+        status: newProd.stock === 0 ? 'Out of Stock' : newProd.stock <= 20 ? 'Low Stock' : 'Healthy',
+        batchNo: 'BCH-INITIAL',
+        serialNo: 'SN-INITIAL'
+      }
+    ]);
+
+    addToast(`Added product "${newProd.name}" to catalog!`);
+  };
+
   // --- CUSTOMER CART & ORDER WORKFLOW METHODS ---
 
   // Cart Management
