@@ -14,7 +14,7 @@ export const Sidebar = () => {
 
   const isStaff = user?.role?.toUpperCase() === 'STAFF';
 
-  // Manager Default Menu Structure
+  // Manager Menu Structure
   const managerMenuGroups = [
     {
       group: 'CORE',
@@ -112,7 +112,7 @@ export const Sidebar = () => {
     }
   ];
 
-  // EXACT STAFF MENU STRUCTURE SPECIFIED BY USER
+  // EXACT STAFF SIDEBAR NAVIGATION SPECIFICATION
   const staffMenuGroups = [
     {
       group: 'CORE',
@@ -286,81 +286,80 @@ export const Sidebar = () => {
   };
 
   return (
-    <aside className="w-72 bg-surface border-r border-border flex flex-col h-screen sticky top-0 overflow-hidden shrink-0">
+    <aside className="w-[280px] bg-[#090E16] border-r border-[#1D2A3A] flex flex-col h-screen sticky top-0 overflow-hidden shrink-0 select-none">
       {/* Logo Area */}
-      <div className="p-6 flex items-center justify-between border-b border-border">
+      <div className="px-6 py-5 flex items-center justify-between border-b border-[#1D2A3A]">
         <div className="flex items-center gap-3">
-          <Hexagon className="w-8 h-8 text-primary" fill="currentColor" fillOpacity={0.2} />
-          <span className="font-heading font-bold text-2xl tracking-[0.15em] text-foreground">NEXORA</span>
+          <Hexagon className="w-8 h-8 text-[#E7B65A]" fill="#E7B65A" fillOpacity={0.2} />
+          <span className="font-bold text-xl tracking-[0.18em] text-[#F5F7FA]">NEXORA</span>
         </div>
         {isStaff && (
-          <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-primary/20 text-primary border border-primary/30">
+          <span className="px-2 py-0.5 rounded text-[9px] font-extrabold bg-[#E7B65A]/15 text-[#E7B65A] border border-[#E7B65A]/30">
             STAFF
           </span>
         )}
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-4 py-4 space-y-6 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
+      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-5 scrollbar-thin scrollbar-thumb-[#1D2A3A] scrollbar-track-transparent">
         {menuGroups.map((group, groupIdx) => (
           <div key={groupIdx}>
-            <h3 className="text-[10px] font-bold text-muted uppercase tracking-widest mb-3 px-4">
+            <h3 className="text-[10px] font-extrabold text-[#7F8DA3] uppercase tracking-widest mb-2 px-3">
               {group.group}
             </h3>
             <div className="space-y-1">
               {group.items.map((item) => {
                 const isExpanded = expandedMenus[item.label];
                 const hasSubmenus = item.submenus && item.submenus.length > 0;
-                
                 const isChildActive = hasSubmenus && item.submenus.some(sub => location.pathname === sub.path);
-                const isParentActive = item.path ? location.pathname === item.path : isChildActive;
+                const isDirectActive = item.path && location.pathname === item.path;
 
                 return (
                   <div key={item.label}>
                     {hasSubmenus ? (
                       <button
                         onClick={() => toggleMenu(item.label)}
-                        className={`w-full flex items-center justify-between px-4 py-2.5 rounded-lg transition-all duration-200 ${
-                          isChildActive && !isExpanded
-                            ? 'bg-surface-elevated text-primary border-l-2 border-primary shadow-[inset_0px_0px_16px_rgba(214,168,95,0.08)] font-semibold'
-                            : 'text-muted hover:bg-surface-elevated hover:text-foreground'
+                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 ${
+                          isChildActive
+                            ? 'bg-[#E7B65A]/15 text-[#E7B65A] border-l-2 border-[#E7B65A] shadow-[inset_0px_0px_12px_rgba(231,182,90,0.1)]'
+                            : 'text-[#7F8DA3] hover:bg-[#111A26] hover:text-[#F5F7FA]'
                         }`}
                       >
-                        <div className="flex items-center gap-3">
-                          <item.icon className="w-5 h-5 text-muted" />
-                          <span className="font-medium text-sm">{item.label}</span>
+                        <div className="flex items-center gap-2.5">
+                          <item.icon className={`w-4 h-4 ${isChildActive ? 'text-[#E7B65A]' : 'text-[#7F8DA3]'}`} />
+                          <span>{item.label}</span>
                         </div>
-                        {isExpanded ? <ChevronDown className="w-4 h-4 text-muted" /> : <ChevronRight className="w-4 h-4 text-muted" />}
+                        {isExpanded ? <ChevronDown className="w-3.5 h-3.5 text-[#7F8DA3]" /> : <ChevronRight className="w-3.5 h-3.5 text-[#7F8DA3]" />}
                       </button>
                     ) : (
                       <NavLink
                         to={item.path}
                         className={({ isActive }) =>
-                          `flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 ${
+                          `flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 ${
                             isActive
-                              ? 'bg-surface-elevated text-primary border-l-2 border-primary shadow-[inset_0px_0px_16px_rgba(214,168,95,0.08)] font-semibold'
-                              : 'text-muted hover:bg-surface-elevated hover:text-foreground'
+                              ? 'bg-[#E7B65A]/15 text-[#E7B65A] border-l-2 border-[#E7B65A] shadow-[inset_0px_0px_12px_rgba(231,182,90,0.1)]'
+                              : 'text-[#7F8DA3] hover:bg-[#111A26] hover:text-[#F5F7FA]'
                           }`
                         }
                       >
-                        <item.icon className="w-5 h-5" />
-                        <span className="font-medium text-sm">{item.label}</span>
+                        <item.icon className="w-4 h-4" />
+                        <span>{item.label}</span>
                       </NavLink>
                     )}
 
                     {/* Submenus */}
                     {hasSubmenus && isExpanded && (
-                      <div className="mt-1 mb-2 ml-4 pl-4 border-l border-border space-y-1">
+                      <div className="mt-1 mb-1.5 ml-3 pl-3 border-l border-[#1D2A3A] space-y-1">
                         {item.submenus.map(sub => (
                           <NavLink
                             key={sub.path}
                             to={sub.path}
                             end
                             className={({ isActive }) =>
-                              `block px-4 py-2 rounded-md text-sm transition-all duration-200 ${
+                              `block px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 ${
                                 isActive
-                                  ? 'bg-primary/10 text-primary font-bold border-l-2 border-primary'
-                                  : 'text-muted hover:bg-surface-elevated hover:text-foreground'
+                                  ? 'bg-[#E7B65A]/20 text-[#E7B65A] font-bold border-l-2 border-[#E7B65A]'
+                                  : 'text-[#7F8DA3] hover:bg-[#111A26] hover:text-[#F5F7FA]'
                               }`
                             }
                           >
@@ -381,18 +380,21 @@ export const Sidebar = () => {
       <NavLink 
         to="/system-status"
         className={({ isActive }) =>
-          `p-4 border border-border m-4 rounded-xl flex items-center justify-between shrink-0 transition-all ${
+          `p-3.5 border border-[#1D2A3A] m-3 rounded-xl flex items-center justify-between shrink-0 transition-all ${
             isActive 
-              ? 'bg-primary/10 border-primary text-primary shadow-[0_0_15px_rgba(214,168,95,0.15)]' 
-              : 'bg-surface-elevated hover:border-primary/50 text-muted hover:text-foreground'
+              ? 'bg-[#E7B65A]/15 border-[#E7B65A] text-[#E7B65A]' 
+              : 'bg-[#0D141E] hover:border-[#E7B65A]/40 text-[#7F8DA3] hover:text-[#F5F7FA]'
           }`
         }
       >
-        <div className="flex items-center gap-2 text-sm">
-          <Bell className="w-4 h-4" />
-          <span className="font-medium">System Status</span>
+        <div className="flex items-center gap-2 text-xs font-semibold">
+          <Bell className="w-3.5 h-3.5 text-[#E7B65A]" />
+          <span>System Status</span>
         </div>
-        <div className="w-2.5 h-2.5 rounded-full bg-success animate-pulse shadow-[0_0_8px_rgba(111,175,143,0.8)]"></div>
+        <div className="flex items-center gap-1.5">
+          <span className="w-2 h-2 rounded-full bg-[#43C98B] animate-pulse"></span>
+          <span className="text-[10px] text-[#43C98B] font-bold">Operational</span>
+        </div>
       </NavLink>
     </aside>
   );
