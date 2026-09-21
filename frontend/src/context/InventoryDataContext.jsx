@@ -992,6 +992,100 @@ export const InventoryDataProvider = ({ children }) => {
     addToast(`Added product "${newProd.name}" to catalog!`);
   };
 
+  // Delete Product
+  const deleteProduct = (id) => {
+    setProducts(prev => prev.filter(p => p.id !== id));
+    setInventoryItems(prev => prev.filter(i => i.productId !== id));
+    addToast('Product removed from catalog', 'warning');
+  };
+
+  // Add Supplier
+  const addSupplier = (supplier) => {
+    const newSupp = {
+      id: Date.now(),
+      name: supplier.name,
+      contact: supplier.contact || 'N/A',
+      email: supplier.email,
+      phone: supplier.phone || 'N/A',
+      address: supplier.address || 'N/A',
+      productsSupplied: supplier.productsSupplied || 'General Supplies',
+      totalPurchases: 0,
+      status: 'Active'
+    };
+    setSuppliers(prev => [newSupp, ...prev]);
+    addToast(`Added supplier "${supplier.name}"`);
+  };
+
+  // Add Customer
+  const addCustomer = (customer) => {
+    const newCust = {
+      id: Date.now(),
+      name: customer.name,
+      email: customer.email,
+      phone: customer.phone || 'N/A',
+      address: customer.address || 'N/A',
+      ordersCount: 0,
+      totalSpent: 0,
+      status: 'Standard'
+    };
+    setCustomers(prev => [newCust, ...prev]);
+    addToast(`Added customer "${customer.name}"`);
+  };
+
+  // Add Purchase Order
+  const addPurchaseOrder = (po) => {
+    const newPo = {
+      id: Date.now(),
+      poNumber: `PO-2026-${Math.floor(1000 + Math.random() * 9000)}`,
+      supplier: po.supplier || 'General Supplier',
+      date: new Date().toISOString().split('T')[0],
+      expectedDelivery: po.expectedDelivery || '2026-10-01',
+      totalAmount: parseFloat(po.totalAmount || 1000),
+      status: 'Pending',
+      itemsCount: parseInt(po.itemsCount || 10, 10)
+    };
+    setPurchaseOrders(prev => [newPo, ...prev]);
+    addToast(`Purchase Order ${newPo.poNumber} created!`);
+  };
+
+  // Create Order
+  const createOrder = (orderData) => {
+    const newOrd = {
+      id: Date.now(),
+      orderNumber: `ORD-2026-${Math.floor(1000 + Math.random() * 9000)}`,
+      customer: orderData.customer || 'Enterprise Client',
+      products: orderData.products || 'Mixed Equipment Order',
+      quantity: parseInt(orderData.quantity || 1, 10),
+      total: parseFloat(orderData.total || 999),
+      warehouse: orderData.warehouse || 'WH-EAST',
+      orderDate: new Date().toISOString().split('T')[0],
+      status: 'Confirmed'
+    };
+    setOrders(prev => [newOrd, ...prev]);
+    addToast(`Order ${newOrd.orderNumber} placed successfully!`);
+  };
+
+  // Add User
+  const addUser = (userData) => {
+    const newUser = {
+      id: Date.now(),
+      name: userData.name,
+      email: userData.email,
+      role: userData.role || 'Staff',
+      department: userData.department || 'Operations',
+      status: 'Active',
+      lastLogin: 'Never'
+    };
+    setUsersList(prev => [newUser, ...prev]);
+    addToast(`User ${userData.name} created!`);
+  };
+
+  // Approve Discrepancy
+  const approveDiscrepancy = (id) => {
+    setDiscrepancies(prev => prev.map(d => d.id === id ? { ...d, status: 'Approved & Adjusted' } : d));
+    addToast(`Discrepancy adjustment approved! Stock aligned.`);
+  };
+
   // --- CUSTOMER CART & ORDER WORKFLOW METHODS ---
 
   // Cart Management
