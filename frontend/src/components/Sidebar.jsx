@@ -1,25 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth, getUserRole } from '../context/AuthContext';
 import { 
   LayoutDashboard, Package, Warehouse, ShoppingCart, Bell, Hexagon, 
   Layers, ArrowRightLeft, Activity, Users, Settings, 
   BarChart2, FileText, ChevronDown, ChevronRight, ShieldCheck, 
-  UserCircle, HelpCircle, Truck, Database, Smartphone, QrCode, CheckSquare, RotateCcw
+  UserCircle, HelpCircle, Truck, Database, Smartphone, QrCode, CheckSquare, RotateCcw,
+  ShoppingBag, MapPin, Heart, ListOrdered
 } from 'lucide-react';
 
 export const Sidebar = () => {
   const location = useLocation();
   const { user } = useAuth();
+  const role = getUserRole(user);
 
-  const isStaff = user?.role?.toUpperCase() === 'STAFF';
-
-  // Manager Menu Structure
-  const managerMenuGroups = [
+  // 1. ADMIN MENU STRUCTURE
+  const adminMenuGroups = [
+    {
+      group: 'ADMINISTRATION',
+      items: [
+        { label: 'Dashboard', icon: LayoutDashboard, path: '/admin-dashboard' },
+        { label: 'Users & Roles', icon: UserCircle, path: '/users-roles' },
+        { label: 'Customer Management', icon: Users, path: '/customers' },
+        { label: 'Audit Logs', icon: FileText, path: '/audit-logs' },
+        { label: 'System Settings', icon: Settings, path: '/settings' }
+      ]
+    },
     {
       group: 'CORE',
       items: [
-        { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
         { 
           label: 'Inventory', icon: Layers, 
           submenus: [
@@ -31,6 +40,14 @@ export const Sidebar = () => {
           ]
         },
         { 
+          label: 'Products', icon: Package,
+          submenus: [
+            { label: 'All Products', path: '/products' },
+            { label: 'Categories & Brands', path: '/products/categories-brands' },
+            { label: 'Batches & Serial Nos', path: '/products/batches-serials' }
+          ]
+        },
+        { 
           label: 'Warehouses', icon: Warehouse,
           submenus: [
             { label: 'All Warehouses', path: '/warehouses' },
@@ -38,14 +55,7 @@ export const Sidebar = () => {
             { label: 'Warehouse Capacity', path: '/warehouses/capacity' }
           ]
         },
-        { 
-          label: 'Products', icon: Package,
-          submenus: [
-            { label: 'All Products', path: '/products' },
-            { label: 'Categories & Brands', path: '/products/categories-brands' },
-            { label: 'Batches & Serial Nos', path: '/products/batches-serials' }
-          ]
-        }
+        { label: 'Orders', icon: ShoppingCart, path: '/orders' }
       ]
     },
     {
@@ -87,9 +97,7 @@ export const Sidebar = () => {
             { label: 'Purchase Requests', path: '/procurement/purchase-requests' }
           ]
         },
-        { label: 'Orders', icon: ShoppingCart, path: '/orders' },
-        { label: 'Suppliers', icon: Database, path: '/suppliers' },
-        { label: 'Customers', icon: Users, path: '/customers' }
+        { label: 'Suppliers', icon: Database, path: '/suppliers' }
       ]
     },
     {
@@ -98,26 +106,119 @@ export const Sidebar = () => {
         { label: 'Smart Inventory', icon: Smartphone, path: '/smart-inventory' },
         { label: 'Analytics', icon: BarChart2, path: '/analytics' },
         { label: 'Reports', icon: FileText, path: '/reports' },
-        { label: 'Barcode/QR', icon: QrCode, path: '/barcode-qr' }
+        { label: 'Barcode / QR', icon: QrCode, path: '/barcode-qr' }
       ]
     },
     {
-      group: 'ADMINISTRATION',
+      group: 'SUPPORT',
       items: [
-        { label: 'Users & Roles', icon: UserCircle, path: '/users-roles' },
-        { label: 'Audit Logs', icon: FileText, path: '/audit-logs' },
-        { label: 'Settings', icon: Settings, path: '/settings' },
+        { label: 'Notifications', icon: Bell, path: '/notifications' },
         { label: 'Help & Support', icon: HelpCircle, path: '/help-support' }
       ]
     }
   ];
 
-  // EXACT STAFF SIDEBAR NAVIGATION SPECIFICATION
+  // 2. MANAGER MENU STRUCTURE (Administration Options REMOVED as per spec)
+  const managerMenuGroups = [
+    {
+      group: 'CORE',
+      items: [
+        { label: 'Dashboard', icon: LayoutDashboard, path: '/manager-dashboard' },
+        { 
+          label: 'Inventory', icon: Layers, 
+          submenus: [
+            { label: 'All Inventory', path: '/inventory' },
+            { label: 'Available Stock', path: '/inventory/available' },
+            { label: 'Low Stock', path: '/inventory/low-stock' },
+            { label: 'Out of Stock', path: '/inventory/out-of-stock' },
+            { label: 'Inventory Valuation', path: '/inventory/valuation' }
+          ]
+        },
+        { 
+          label: 'Warehouses', icon: Warehouse,
+          submenus: [
+            { label: 'All Warehouses', path: '/warehouses' },
+            { label: 'Locations & Zones', path: '/warehouses/locations' },
+            { label: 'Warehouse Capacity', path: '/warehouses/capacity' }
+          ]
+        },
+        { 
+          label: 'Products', icon: Package,
+          submenus: [
+            { label: 'All Products', path: '/products' },
+            { label: 'Categories & Brands', path: '/products/categories-brands' },
+            { label: 'Batches & Serial Nos', path: '/products/batches-serials' }
+          ]
+        },
+        { label: 'Orders', icon: ShoppingCart, path: '/orders' }
+      ]
+    },
+    {
+      group: 'OPERATIONS',
+      items: [
+        {
+          label: 'Stock Operations', icon: Activity,
+          submenus: [
+            { label: 'Stock In (Receive)', path: '/operations/stock-in' },
+            { label: 'Stock Out (Issue)', path: '/operations/stock-out' },
+            { label: 'Stock Adjustments', path: '/operations/stock-adjustments' }
+          ]
+        },
+        {
+          label: 'Transfers', icon: ArrowRightLeft,
+          submenus: [
+            { label: 'All Transfers', path: '/transfers' },
+            { label: 'Create Transfer', path: '/transfers/create' },
+            { label: 'Pending Approvals', path: '/transfers/pending' }
+          ]
+        },
+        {
+          label: 'Reconciliation', icon: ShieldCheck,
+          submenus: [
+            { label: 'Reconciliation Dash', path: '/reconciliation' },
+            { label: 'Physical Stock Count', path: '/reconciliation/physical-count' },
+            { label: 'Discrepancy Review', path: '/reconciliation/discrepancies' }
+          ]
+        },
+        {
+          label: 'Returns', icon: RotateCcw,
+          submenus: [
+            { label: 'Customer Returns', path: '/returns/customer' },
+            { label: 'Supplier Returns', path: '/returns/supplier' }
+          ]
+        }
+      ]
+    },
+    {
+      group: 'SUPPLY CHAIN',
+      items: [
+        {
+          label: 'Procurement', icon: Truck,
+          submenus: [
+            { label: 'Purchase Orders', path: '/procurement/purchase-orders' },
+            { label: 'Purchase Requests', path: '/procurement/purchase-requests' }
+          ]
+        },
+        { label: 'Suppliers', icon: Database, path: '/suppliers' },
+        { label: 'Customers', icon: Users, path: '/customers' }
+      ]
+    },
+    {
+      group: 'INSIGHTS',
+      items: [
+        { label: 'Smart Inventory', icon: Smartphone, path: '/smart-inventory' },
+        { label: 'Analytics', icon: BarChart2, path: '/analytics' },
+        { label: 'Reports', icon: FileText, path: '/reports' }
+      ]
+    }
+  ];
+
+  // 3. STAFF MENU STRUCTURE
   const staffMenuGroups = [
     {
       group: 'CORE',
       items: [
-        { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
+        { label: 'Dashboard', icon: LayoutDashboard, path: '/staff-dashboard' },
         { 
           label: 'Inventory', icon: Layers, 
           submenus: [
@@ -243,7 +344,40 @@ export const Sidebar = () => {
     }
   ];
 
-  const menuGroups = isStaff ? staffMenuGroups : managerMenuGroups;
+  // 4. CUSTOMER MENU STRUCTURE
+  const customerMenuGroups = [
+    {
+      group: 'CUSTOMER PORTAL',
+      items: [
+        { label: 'Dashboard', icon: LayoutDashboard, path: '/customer-dashboard' },
+        { label: 'Browse Products', icon: ShoppingBag, path: '/customer/products' },
+        { label: 'Categories', icon: Layers, path: '/products/categories-brands' },
+        { label: 'My Cart', icon: ShoppingCart, path: '/customer/cart' },
+        { label: 'My Orders', icon: ListOrdered, path: '/customer/orders' },
+        { label: 'Track Order', icon: Truck, path: '/customer/track-order' }
+      ]
+    },
+    {
+      group: 'PREFERENCES',
+      items: [
+        { label: 'Wishlist', icon: Heart, path: '/customer/wishlist' },
+        { label: 'Addresses', icon: MapPin, path: '/customer/addresses' },
+        { label: 'Notifications', icon: Bell, path: '/notifications' },
+        { label: 'My Profile', icon: UserCircle, path: '/profile' },
+        { label: 'Help & Support', icon: HelpCircle, path: '/help-support' },
+        { label: 'Settings', icon: Settings, path: '/settings' }
+      ]
+    }
+  ];
+
+  // Pick menu group tree based on active role
+  const menuGroups = role === 'ADMIN' 
+    ? adminMenuGroups 
+    : role === 'MANAGER' 
+    ? managerMenuGroups 
+    : role === 'CUSTOMER' 
+    ? customerMenuGroups 
+    : staffMenuGroups;
 
   const [expandedMenus, setExpandedMenus] = useState(() => {
     const saved = localStorage.getItem('expandedMenus');
@@ -272,7 +406,7 @@ export const Sidebar = () => {
         }
       });
     });
-  }, [location.pathname, isStaff]);
+  }, [location.pathname, role]);
 
   useEffect(() => {
     localStorage.setItem('expandedMenus', JSON.stringify(expandedMenus));
@@ -285,6 +419,16 @@ export const Sidebar = () => {
     }));
   };
 
+  const getRoleBadgeStyle = (userRole) => {
+    switch (userRole) {
+      case 'ADMIN': return 'bg-[#5B9CF6]/15 text-[#5B9CF6] border-[#5B9CF6]/30';
+      case 'MANAGER': return 'bg-[#E7B65A]/15 text-[#E7B65A] border-[#E7B65A]/30';
+      case 'STAFF': return 'bg-[#43C98B]/15 text-[#43C98B] border-[#43C98B]/30';
+      case 'CUSTOMER': return 'bg-[#E056FD]/15 text-[#E056FD] border-[#E056FD]/30';
+      default: return 'bg-[#E7B65A]/15 text-[#E7B65A] border-[#E7B65A]/30';
+    }
+  };
+
   return (
     <aside className="w-[280px] bg-[#090E16] border-r border-[#1D2A3A] flex flex-col h-screen sticky top-0 overflow-hidden shrink-0 select-none">
       {/* Logo Area */}
@@ -293,11 +437,9 @@ export const Sidebar = () => {
           <Hexagon className="w-8 h-8 text-[#E7B65A]" fill="#E7B65A" fillOpacity={0.2} />
           <span className="font-bold text-xl tracking-[0.18em] text-[#F5F7FA]">NEXORA</span>
         </div>
-        {isStaff && (
-          <span className="px-2 py-0.5 rounded text-[9px] font-extrabold bg-[#E7B65A]/15 text-[#E7B65A] border border-[#E7B65A]/30">
-            STAFF
-          </span>
-        )}
+        <span className={`px-2 py-0.5 rounded text-[9px] font-extrabold border uppercase tracking-wider ${getRoleBadgeStyle(role)}`}>
+          {role}
+        </span>
       </div>
 
       {/* Navigation */}
@@ -312,7 +454,6 @@ export const Sidebar = () => {
                 const isExpanded = expandedMenus[item.label];
                 const hasSubmenus = item.submenus && item.submenus.length > 0;
                 const isChildActive = hasSubmenus && item.submenus.some(sub => location.pathname === sub.path);
-                const isDirectActive = item.path && location.pathname === item.path;
 
                 return (
                   <div key={item.label}>

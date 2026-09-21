@@ -1,296 +1,226 @@
 import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, ChevronDown, ChevronRight, ShoppingCart, CheckCircle2, Building2 } from 'lucide-react';
-import { getOrders, placeOrder as createOrder } from '../api/orderApi';
-import { getProducts } from '../api/productApi';
-import { getWarehouses } from '../api/inventoryApi';
-import { useAuth } from '../context/AuthContext';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
-import { SlidePanel } from '../components/ui/SlidePanel';
-import { Badge } from '../components/ui/badge';
+import { useInventoryData } from '../context/InventoryDataContext';
+import { useAuth, getUserRole } from '../context/AuthContext';
+import { 
+  ShoppingCart, CheckCircle, XCircle, Clock, Truck, Package, 
+  ChevronRight, Filter, Search, ShieldAlert, ArrowRight
+} from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export const OrdersPage = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
-  const queryClient = useQueryClient();
-  const isManager = user?.role === 'MANAGER';
-  
-  const [expandedOrderId, setExpandedOrderId] = useState(null);
-  const [isPanelOpen, setIsPanelOpen] = useState(false);
-  const [orderStep, setOrderStep] = useState(1);
-  const [newOrder, setNewOrder] = useState({ items: [], warehouseId: '' });
-  const [selectedProduct, setSelectedProduct] = useState('');
-  const [selectedQty, setSelectedQty] = useState('');
+  const role = getUserRole(user);
+  const { orders, approveCustomerOrder, rejectCustomerOrder } = useInventoryData();
 
-  const { data: orders = [], isLoading: isLoadingOrders } = useQuery({ queryKey: ['orders'], queryFn: getOrders });
-  const { data: products = [] } = useQuery({ queryKey: ['products'], queryFn: getProducts });
-  const { data: warehouses = [] } = useQuery({ queryKey: ['warehouses'], queryFn: getWarehouses });
+  const [activeTab, setActiveTab] = useState('ALL');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [rejectingOrder, setRejectingOrder] = useState(null);
+  const [rejectionReason, setRejectionReason] = useState('');
 
-  const createMutation = useMutation({
-    mutationFn: createOrder,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['orders'] });
-      setIsPanelOpen(false);
-      setOrderStep(1);
-      setNewOrder({ items: [], warehouseId: '' });
-    },
+  const isManager = role === 'MANAGER' || role === 'ADMIN';
+
+  const handleConfirmReject = (e) => {
+    e.preventDefault();
+    if (!rejectingOrder) return;
+    if (!rejectionReason.trim()) {
+      alert('Please provide a rejection reason.');
+      return;
+    }
+    rejectCustomerOrder(rejectingOrder.id, rejectionReason, user?.sub || 'manager@nexora.io');
+    setRejectingOrder(null);
+    setRejectionReason('');
+  };
+
+  const filteredOrders = orders.filter(o => {
+    const matchesSearch = o.orderNumber.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          (o.customer && o.customer.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                          (o.products && o.products.toLowerCase().includes(searchTerm.toLowerCase()));
+    
+    if (activeTab === 'PENDING') return matchesSearch && o.status === 'PENDING_MANAGER_APPROVAL';
+    if (activeTab === 'APPROVED') return matchesSearch && (o.status === 'APPROVED' || o.status === 'IN_PROGRESS' || o.status === 'PICKED' || o.status === 'PACKED');
+    if (activeTab === 'DISPATCHED') return matchesSearch && (o.status === 'DISPATCHED' || o.status === 'DELIVERED');
+    if (activeTab === 'REJECTED') return matchesSearch && o.status === 'REJECTED';
+    return matchesSearch;
   });
 
-  const toggleRow = (id) => {
-    setExpandedOrderId(expandedOrderId === id ? null : id);
+  const getStatusBadge = (status) => {
+    switch (status) {
+      case 'PENDING_MANAGER_APPROVAL': return 'bg-[#E7B65A]/20 text-[#E7B65A] border-[#E7B65A]/30';
+      case 'APPROVED': return 'bg-[#5B9CF6]/20 text-[#5B9CF6] border-[#5B9CF6]/30';
+      case 'DISPATCHED':
+      case 'DELIVERED': return 'bg-[#43C98B]/20 text-[#43C98B] border-[#43C98B]/30';
+      case 'REJECTED': return 'bg-[#EF6461]/20 text-[#EF6461] border-[#EF6461]/30';
+      default: return 'bg-[#5B9CF6]/20 text-[#5B9CF6] border-[#5B9CF6]/30';
+    }
   };
-
-  const handleAddItem = () => {
-    if (!selectedProduct || !selectedQty) return;
-    const p = products.find(x => x.id === selectedProduct);
-    if (!p) return;
-    
-    setNewOrder({
-      ...newOrder,
-      items: [...newOrder.items, { productId: p.id, name: p.name, quantity: parseInt(selectedQty), unitPrice: p.unitPrice }]
-    });
-    setSelectedProduct('');
-    setSelectedQty('');
-  };
-
-  const handleRemoveItem = (index) => {
-    const updated = [...newOrder.items];
-    updated.splice(index, 1);
-    setNewOrder({ ...newOrder, items: updated });
-  };
-
-  const handleSubmitOrder = () => {
-    const payload = {
-      warehouseId: newOrder.warehouseId,
-      items: newOrder.items.map(i => ({ productId: i.productId, quantity: i.quantity }))
-    };
-    createMutation.mutate(payload);
-  };
-
-  const getProductName = (id) => products.find(p => p.id === id)?.name || id;
-  const getWarehouseName = (id) => warehouses.find(w => w.id === id)?.name || id;
-
-  const orderTotal = newOrder.items.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
 
   return (
-    <div className="space-y-8">
-      <div className="flex justify-between items-end">
+    <div className="space-y-6 pb-12 animate-in fade-in duration-200 select-none">
+      {/* Header */}
+      <div className="bg-[#0D141E] border border-[#1D2A3A] rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-lg">
         <div>
-          <h1 className="text-3xl font-heading font-bold text-foreground">Order Management</h1>
-          <p className="text-muted mt-1">Track customer orders and fulfillment status.</p>
+          <h1 className="text-2xl font-bold text-[#F5F7FA]">Order Management & Lifecycle Control</h1>
+          <p className="text-xs text-[#7F8DA3] mt-1">Supervise customer orders, Manager authorization queues, and fulfillment statuses.</p>
         </div>
-        {isManager && (
-          <Button onClick={() => { setIsPanelOpen(true); setOrderStep(1); setNewOrder({ items: [], warehouseId: '' }); }}>
-            <Plus className="w-4 h-4 mr-2" /> Place New Order
-          </Button>
+
+        {role === 'CUSTOMER' && (
+          <button
+            onClick={() => navigate('/customer/products')}
+            className="px-4 py-2 bg-[#E7B65A] text-[#070B11] font-bold rounded-xl text-xs hover:bg-[#f0c46e] transition-all"
+          >
+            + Place New Customer Order
+          </button>
         )}
       </div>
 
-      <div className="border border-border rounded-xl bg-surface shadow-sm overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-12"></TableHead>
-              <TableHead>Order ID</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead className="text-right">Items</TableHead>
-              <TableHead className="text-right">Total</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoadingOrders ? (
-              <TableRow><TableCell colSpan={6} className="text-center py-12 text-muted font-mono">LOADING_ORDERS...</TableCell></TableRow>
-            ) : orders.length === 0 ? (
-              <TableRow><TableCell colSpan={6} className="text-center py-12 text-muted">No orders found.</TableCell></TableRow>
-            ) : (
-              orders.map((o) => (
-                <React.Fragment key={o.id}>
-                  <TableRow className="cursor-pointer group" onClick={() => toggleRow(o.id)}>
-                    <TableCell>
-                      <button className="p-1 rounded hover:bg-surface-elevated text-muted group-hover:text-primary transition-colors">
-                        {expandedOrderId === o.id ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-                      </button>
-                    </TableCell>
-                    <TableCell className="font-mono text-primary font-medium">#{o.id.substring(0,8).toUpperCase()}</TableCell>
-                    <TableCell><Badge status={o.status} /></TableCell>
-                    <TableCell className="text-muted text-xs font-mono">{new Date(o.createdAt).toLocaleString()}</TableCell>
-                    <TableCell className="text-right font-mono">{o.items.length}</TableCell>
-                    <TableCell className="text-right font-mono font-bold text-foreground">
-                      ${o.items.reduce((acc, i) => acc + (i.priceAtOrder * i.quantity), 0).toFixed(2)}
-                    </TableCell>
-                  </TableRow>
-                  {expandedOrderId === o.id && (
-                    <TableRow className="bg-surface-elevated/50 hover:bg-surface-elevated/50">
-                      <TableCell colSpan={6} className="p-0 border-b border-border">
-                        <div className="p-6 pl-16">
-                          <h4 className="text-xs font-bold text-muted uppercase tracking-wider mb-4 flex items-center gap-2">
-                            <ShoppingCart className="w-4 h-4" /> Order Line Items
-                          </h4>
-                          <div className="bg-surface border border-border rounded-lg overflow-hidden">
-                            <Table>
-                              <TableHeader>
-                                <TableRow className="border-border">
-                                  <TableHead className="h-8 bg-surface-elevated text-[10px]">Product</TableHead>
-                                  <TableHead className="h-8 bg-surface-elevated text-[10px] text-right">Unit Price</TableHead>
-                                  <TableHead className="h-8 bg-surface-elevated text-[10px] text-right">Qty</TableHead>
-                                  <TableHead className="h-8 bg-surface-elevated text-[10px] text-right">Subtotal</TableHead>
-                                </TableRow>
-                              </TableHeader>
-                              <TableBody>
-                                {o.items.map(item => (
-                                  <TableRow key={item.id} className="border-border">
-                                    <TableCell className="py-2 text-sm text-foreground">{getProductName(item.productId)}</TableCell>
-                                    <TableCell className="py-2 text-right font-mono text-muted text-xs">${item.priceAtOrder.toFixed(2)}</TableCell>
-                                    <TableCell className="py-2 text-right font-mono text-foreground text-sm">{item.quantity}</TableCell>
-                                    <TableCell className="py-2 text-right font-mono text-primary font-medium text-sm">
-                                      ${(item.priceAtOrder * item.quantity).toFixed(2)}
-                                    </TableCell>
-                                  </TableRow>
-                                ))}
-                              </TableBody>
-                            </Table>
-                          </div>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </React.Fragment>
-              ))
-            )}
-          </TableBody>
-        </Table>
+      {/* Filter Tabs & Search */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-[#0D141E] border border-[#1D2A3A] p-4 rounded-xl">
+        <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto">
+          {['ALL', 'PENDING', 'APPROVED', 'DISPATCHED', 'REJECTED'].map(tab => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all ${
+                activeTab === tab
+                  ? 'bg-[#E7B65A] text-[#070B11]'
+                  : 'bg-[#111A26] text-[#7F8DA3] border border-[#1D2A3A] hover:text-[#F5F7FA]'
+              }`}
+            >
+              {tab === 'PENDING' ? 'Pending Approval' : tab}
+            </button>
+          ))}
+        </div>
+
+        <div className="relative w-full sm:w-72">
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#7F8DA3]" />
+          <input
+            type="text"
+            placeholder="Search order number or customer..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full bg-[#111A26] border border-[#1D2A3A] rounded-xl pl-9 pr-4 py-1.5 text-xs text-[#F5F7FA] focus:outline-none focus:border-[#E7B65A]"
+          />
+        </div>
       </div>
 
-      <SlidePanel isOpen={isPanelOpen} onClose={() => setIsPanelOpen(false)} title="Place New Order">
-        <div className="flex flex-col h-full">
-          {/* Step indicator */}
-          <div className="flex items-center justify-between mb-8 relative">
-            <div className="absolute left-0 top-1/2 w-full h-px bg-border -z-10"></div>
-            {[1, 2, 3].map(step => (
-              <div key={step} className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
-                orderStep === step ? 'bg-primary text-[#0A0E14] shadow-[0_0_12px_rgba(0,229,184,0.4)]' : 
-                orderStep > step ? 'bg-success text-[#0A0E14]' : 'bg-surface-elevated border border-border text-muted'
-              }`}>
-                {orderStep > step ? <CheckCircle2 className="w-5 h-5" /> : step}
-              </div>
-            ))}
-          </div>
+      {/* Orders Table */}
+      <div className="bg-[#0D141E] border border-[#1D2A3A] rounded-2xl overflow-hidden shadow-xl">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr className="bg-[#111A26] border-b border-[#1D2A3A] text-[#7F8DA3] uppercase font-semibold">
+                <th className="py-3.5 px-4">Order ID</th>
+                <th className="py-3.5 px-4">Customer</th>
+                <th className="py-3.5 px-4">Products</th>
+                <th className="py-3.5 px-4">Warehouse</th>
+                <th className="py-3.5 px-4 text-right">Total Value</th>
+                <th className="py-3.5 px-4">Status</th>
+                {isManager && <th className="py-3.5 px-4 text-center">Manager Action</th>}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#1D2A3A]/60">
+              {filteredOrders.length === 0 ? (
+                <tr>
+                  <td colSpan={isManager ? 7 : 6} className="py-12 text-center text-[#7F8DA3]">
+                    No orders matching criteria.
+                  </td>
+                </tr>
+              ) : (
+                filteredOrders.map(ord => (
+                  <tr key={ord.id} className="hover:bg-[#111A26]/50 transition">
+                    <td className="py-3.5 px-4 font-mono font-bold text-[#E7B65A]">{ord.orderNumber}</td>
+                    <td className="py-3.5 px-4">
+                      <div className="font-bold text-[#F5F7FA]">{ord.customerName || ord.customer}</div>
+                      <div className="text-[10px] text-[#7F8DA3] font-mono">{ord.customer}</div>
+                    </td>
+                    <td className="py-3.5 px-4 text-[#F5F7FA] font-medium">{ord.products}</td>
+                    <td className="py-3.5 px-4 font-mono text-[#5B9CF6]">{ord.warehouse || 'WH-EAST'}</td>
+                    <td className="py-3.5 px-4 text-right font-mono font-bold text-[#43C98B]">
+                      ${(ord.total || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    </td>
+                    <td className="py-3.5 px-4">
+                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase border ${getStatusBadge(ord.status)}`}>
+                        {ord.status.replace(/_/g, ' ')}
+                      </span>
+                    </td>
+                    {isManager && (
+                      <td className="py-3.5 px-4 text-center">
+                        {ord.status === 'PENDING_MANAGER_APPROVAL' ? (
+                          <div className="flex items-center justify-center gap-2">
+                            <button
+                              onClick={() => approveCustomerOrder(ord.id, user?.sub || 'manager@nexora.io')}
+                              className="px-2.5 py-1 bg-[#43C98B] hover:bg-[#3bb37b] text-[#070B11] font-bold rounded-lg text-[10px] transition-all"
+                            >
+                              Approve
+                            </button>
+                            <button
+                              onClick={() => { setRejectingOrder(ord); setRejectionReason(''); }}
+                              className="px-2.5 py-1 bg-[#EF6461]/20 text-[#EF6461] hover:bg-[#EF6461] hover:text-[#070B11] border border-[#EF6461]/30 font-bold rounded-lg text-[10px] transition-all"
+                            >
+                              Reject
+                            </button>
+                          </div>
+                        ) : (
+                          <span className="text-[10px] text-[#7F8DA3]">Reviewed</span>
+                        )}
+                      </td>
+                    )}
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-          <div className="flex-1 overflow-y-auto">
-            {orderStep === 1 && (
-              <div className="space-y-6">
-                <h3 className="text-lg font-heading font-semibold">1. Select Products</h3>
-                <div className="bg-surface border border-border p-4 rounded-lg space-y-4">
-                  <div>
-                    <label className="text-[10px] text-muted uppercase tracking-wider font-bold mb-1 block">Product</label>
-                    <select className="flex h-9 w-full rounded-md border border-border bg-surface-elevated px-3 py-1 text-sm text-foreground shadow-sm focus-visible:outline-none focus-visible:border-primary"
-                      value={selectedProduct} onChange={e => setSelectedProduct(e.target.value)}>
-                      <option value="">Select a product...</option>
-                      {products.map(p => <option key={p.id} value={p.id}>{p.name} - ${p.unitPrice}</option>)}
-                    </select>
-                  </div>
-                  <div className="flex gap-4 items-end">
-                    <div className="flex-1">
-                      <label className="text-[10px] text-muted uppercase tracking-wider font-bold mb-1 block">Quantity</label>
-                      <Input type="number" min="1" value={selectedQty} onChange={e => setSelectedQty(e.target.value)} className="font-mono" />
-                    </div>
-                    <Button type="button" variant="secondary" onClick={handleAddItem}>Add</Button>
-                  </div>
-                </div>
-                
-                {newOrder.items.length > 0 && (
-                  <div className="border border-border rounded-lg bg-surface overflow-hidden">
-                    <Table>
-                      <TableHeader><TableRow><TableHead>Item</TableHead><TableHead className="text-right">Qty</TableHead><TableHead></TableHead></TableRow></TableHeader>
-                      <TableBody>
-                        {newOrder.items.map((item, idx) => (
-                          <TableRow key={idx}>
-                            <TableCell className="text-sm">{item.name}</TableCell>
-                            <TableCell className="text-right font-mono">{item.quantity}</TableCell>
-                            <TableCell className="text-right">
-                              <button type="button" onClick={() => handleRemoveItem(idx)} className="text-danger hover:underline text-xs">Remove</button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                )}
-              </div>
-            )}
+      {/* Rejection Modal */}
+      {rejectingOrder && (
+        <div className="fixed inset-0 z-50 bg-[#070B11]/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-[#0D141E] border border-[#EF6461]/40 rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4 animate-in zoom-in-95">
+            <div className="flex items-center gap-3 text-[#EF6461]">
+              <XCircle className="w-6 h-6" />
+              <h3 className="text-lg font-bold text-[#F5F7FA]">Reject Customer Order</h3>
+            </div>
 
-            {orderStep === 2 && (
-              <div className="space-y-6">
-                <h3 className="text-lg font-heading font-semibold">2. Select Warehouse</h3>
-                <div className="space-y-3">
-                  {warehouses.map(w => (
-                    <button type="button" key={w.id} onClick={() => setNewOrder({...newOrder, warehouseId: w.id})}
-                      className={`w-full text-left p-4 rounded-xl border transition-all ${
-                        newOrder.warehouseId === w.id 
-                        ? 'border-primary bg-primary/10 shadow-[inset_0_0_12px_rgba(0,229,184,0.1)]' 
-                        : 'border-border bg-surface hover:bg-surface-elevated'
-                      }`}>
-                      <div className="font-medium text-foreground">{w.name}</div>
-                      <div className="text-xs text-muted mt-1">{w.location}</div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+            <p className="text-xs text-[#7F8DA3]">
+              Specify reason for rejecting <strong className="text-[#F5F7FA]">{rejectingOrder.orderNumber}</strong>.
+            </p>
 
-            {orderStep === 3 && (
-              <div className="space-y-6">
-                <h3 className="text-lg font-heading font-semibold">3. Review & Confirm</h3>
-                <div className="bg-surface-elevated rounded-xl p-6 border border-border space-y-6">
-                  <div>
-                    <h4 className="text-xs font-bold text-muted uppercase tracking-wider mb-2">Fulfillment Center</h4>
-                    <p className="text-foreground font-medium flex items-center gap-2">
-                      <Building2 className="w-4 h-4 text-primary" />
-                      {getWarehouseName(newOrder.warehouseId)}
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-muted uppercase tracking-wider mb-2">Order Items</h4>
-                    <ul className="space-y-2">
-                      {newOrder.items.map((item, idx) => (
-                        <li key={idx} className="flex justify-between items-center text-sm border-b border-border/50 pb-2 last:border-0 last:pb-0">
-                          <span className="text-muted">{item.quantity}x {item.name}</span>
-                          <span className="font-mono text-foreground">${(item.quantity * item.unitPrice).toFixed(2)}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div className="pt-4 border-t border-border flex justify-between items-center">
-                    <span className="text-sm font-bold uppercase tracking-wider text-foreground">Total</span>
-                    <span className="text-xl font-mono font-bold text-primary">${orderTotal.toFixed(2)}</span>
-                  </div>
-                </div>
+            <form onSubmit={handleConfirmReject} className="space-y-4">
+              <div>
+                <label className="text-[11px] font-bold text-[#7F8DA3] uppercase block mb-1">
+                  Rejection Reason *
+                </label>
+                <textarea
+                  value={rejectionReason}
+                  onChange={(e) => setRejectionReason(e.target.value)}
+                  required
+                  rows={3}
+                  placeholder="e.g. Stock unavailable in warehouse..."
+                  className="w-full bg-[#111A26] border border-[#1D2A3A] rounded-xl p-3 text-xs text-[#F5F7FA] focus:outline-none focus:border-[#EF6461]"
+                />
               </div>
-            )}
-          </div>
 
-          <div className="mt-8 pt-6 border-t border-border flex justify-between items-center">
-            <Button type="button" variant="ghost" onClick={() => orderStep > 1 ? setOrderStep(orderStep - 1) : setIsPanelOpen(false)}>
-              {orderStep > 1 ? 'Back' : 'Cancel'}
-            </Button>
-            
-            {orderStep < 3 ? (
-              <Button type="button" onClick={() => setOrderStep(orderStep + 1)} disabled={
-                (orderStep === 1 && newOrder.items.length === 0) || 
-                (orderStep === 2 && !newOrder.warehouseId)
-              }>
-                Next Step
-              </Button>
-            ) : (
-              <Button type="button" onClick={handleSubmitOrder} disabled={createMutation.isPending}>
-                {createMutation.isPending ? 'Processing...' : 'Submit Order'}
-              </Button>
-            )}
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setRejectingOrder(null)}
+                  className="px-4 py-2 bg-[#111A26] border border-[#1D2A3A] text-[#7F8DA3] font-semibold text-xs rounded-xl"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-[#EF6461] text-[#070B11] font-bold text-xs rounded-xl hover:bg-[#d94f4c]"
+                >
+                  Confirm Rejection
+                </button>
+              </div>
+            </form>
           </div>
         </div>
-      </SlidePanel>
+      )}
     </div>
   );
 };

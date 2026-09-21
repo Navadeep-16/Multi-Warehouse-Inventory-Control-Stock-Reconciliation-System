@@ -1,12 +1,22 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth, getUserRole } from './context/AuthContext';
 import { InventoryDataProvider } from './context/InventoryDataContext';
 
 import { LoginPage } from './pages/LoginPage';
 import { LandingPage } from './pages/LandingPage';
 import { DashboardPage } from './pages/DashboardPage';
+
+// Role Dashboards
+import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';
+import { ManagerDashboardPage } from './pages/manager/ManagerDashboardPage';
+import { CustomerDashboardPage } from './pages/customer/CustomerDashboardPage';
+
+// Customer Portal Pages
+import { CustomerProductsPage } from './pages/customer/CustomerProductsPage';
+import { CustomerCartPage } from './pages/customer/CustomerCartPage';
+import { CustomerOrdersPage } from './pages/customer/CustomerOrdersPage';
 
 // Inventory pages
 import { AllInventoryPage } from './pages/inventory/AllInventoryPage';
@@ -93,6 +103,20 @@ const MainLayout = ({ children }) => (
   </div>
 );
 
+// Role-based root redirect component
+const DashboardRedirect = () => {
+  const { user } = useAuth();
+  const role = getUserRole(user);
+
+  switch (role) {
+    case 'ADMIN': return <Navigate to="/admin-dashboard" replace />;
+    case 'MANAGER': return <Navigate to="/manager-dashboard" replace />;
+    case 'STAFF': return <Navigate to="/staff-dashboard" replace />;
+    case 'CUSTOMER': return <Navigate to="/customer-dashboard" replace />;
+    default: return <Navigate to="/staff-dashboard" replace />;
+  }
+};
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -103,8 +127,20 @@ function App() {
               <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<LoginPage />} />
               
-              {/* Dashboard */}
-              <Route path="/dashboard" element={<ProtectedRoute><MainLayout><DashboardPage /></MainLayout></ProtectedRoute>} />
+              {/* Default Root Dashboard Redirect */}
+              <Route path="/dashboard" element={<ProtectedRoute><DashboardRedirect /></ProtectedRoute>} />
+              
+              {/* 4 Role-Based Dashboards */}
+              <Route path="/admin-dashboard" element={<ProtectedRoute allowedRoles={['ADMIN']}><MainLayout><AdminDashboardPage /></MainLayout></ProtectedRoute>} />
+              <Route path="/manager-dashboard" element={<ProtectedRoute allowedRoles={['MANAGER', 'ADMIN']}><MainLayout><ManagerDashboardPage /></MainLayout></ProtectedRoute>} />
+              <Route path="/staff-dashboard" element={<ProtectedRoute allowedRoles={['STAFF', 'ADMIN']}><MainLayout><DashboardPage /></MainLayout></ProtectedRoute>} />
+              <Route path="/customer-dashboard" element={<ProtectedRoute allowedRoles={['CUSTOMER', 'ADMIN']}><MainLayout><CustomerDashboardPage /></MainLayout></ProtectedRoute>} />
+
+              {/* Customer E-Commerce Portal */}
+              <Route path="/customer/products" element={<ProtectedRoute allowedRoles={['CUSTOMER', 'ADMIN']}><MainLayout><CustomerProductsPage /></MainLayout></ProtectedRoute>} />
+              <Route path="/customer/cart" element={<ProtectedRoute allowedRoles={['CUSTOMER', 'ADMIN']}><MainLayout><CustomerCartPage /></MainLayout></ProtectedRoute>} />
+              <Route path="/customer/orders" element={<ProtectedRoute allowedRoles={['CUSTOMER', 'ADMIN']}><MainLayout><CustomerOrdersPage /></MainLayout></ProtectedRoute>} />
+              <Route path="/customer/track-order" element={<ProtectedRoute allowedRoles={['CUSTOMER', 'ADMIN']}><MainLayout><CustomerOrdersPage /></MainLayout></ProtectedRoute>} />
               
               {/* Inventory */}
               <Route path="/inventory" element={<ProtectedRoute><MainLayout><AllInventoryPage filterType="all" /></MainLayout></ProtectedRoute>} />

@@ -590,21 +590,116 @@ export const InventoryDataProvider = ({ children }) => {
     { id: 4, name: 'Linear Systems Inc.', email: 'facilities@linear.app', phone: '+1 (415) 332-9012', address: 'San Francisco, CA', ordersCount: 9, totalSpent: 87500.00, status: 'Standard' }
   ]);
 
-  // Orders Data
+  // Shopping Cart State for Customer Portal
+  const [cart, setCart] = useState([
+    { id: 1, productId: 1, name: 'MacBook Pro 16" M3 Max', sku: 'PRO-MAC-16', price: 3499.00, quantity: 1, image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500&q=80', warehouse: 'WH-EAST' },
+    { id: 2, productId: 3, name: 'Dell UltraSharp 32" 4K Monitor', sku: 'MON-DELL-32', price: 899.00, quantity: 2, image: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=500&q=80', warehouse: 'WH-WEST' }
+  ]);
+
+  // Initial Customer Orders & Workflow State
   const [orders, setOrders] = useState([
-    { id: 1, orderNumber: 'ORD-2026-9001', customer: 'Acme Global Innovations', products: 'MacBook Pro 16" M3 Max (x10)', quantity: 10, total: 34990.00, warehouse: 'WH-EAST', orderDate: '2026-09-20', status: 'Confirmed' },
-    { id: 2, orderNumber: 'ORD-2026-9002', customer: 'Stripe Corporate IT', products: 'Samsung 990 PRO 2TB SSD (x100)', quantity: 100, total: 18999.00, warehouse: 'WH-SOUTH', orderDate: '2026-09-19', status: 'Processing' },
-    { id: 3, orderNumber: 'ORD-2026-9003', customer: 'Vercel Infrastructure', products: 'Dell UltraSharp 32" Monitor (x5)', quantity: 5, total: 4495.00, warehouse: 'WH-WEST', orderDate: '2026-09-18', status: 'Shipped' },
-    { id: 4, orderNumber: 'ORD-2026-9004', customer: 'Linear Systems Inc.', products: 'Jarvis Motorized Standing Desk (x3)', quantity: 3, total: 2067.00, warehouse: 'WH-NORTH', orderDate: '2026-09-15', status: 'Delivered' }
+    { 
+      id: 101, 
+      orderNumber: 'ORD-2026-1001', 
+      customer: 'customer@gmail.com',
+      customerName: 'John Doe Customer',
+      items: [
+        { productId: 1, name: 'MacBook Pro 16" M3 Max', quantity: 2, price: 3499.00 },
+        { productId: 5, name: 'Keychron Q1 Pro Mechanical Keyboard', quantity: 1, price: 199.00 }
+      ],
+      products: 'MacBook Pro 16" (x2), Keychron Q1 Pro (x1)', 
+      quantity: 3, 
+      total: 7197.00, 
+      warehouse: 'WH-EAST', 
+      deliveryAddress: '742 Evergreen Terrace, Springfield, OR',
+      orderDate: '2026-09-21', 
+      status: 'PENDING_MANAGER_APPROVAL',
+      createdAt: '2026-09-21 12:30'
+    },
+    { 
+      id: 102, 
+      orderNumber: 'ORD-2026-1002', 
+      customer: 'acme@acme.io',
+      customerName: 'Acme Global Innovations',
+      items: [
+        { productId: 2, name: 'Samsung 990 PRO 2TB NVMe SSD', quantity: 10, price: 189.99 }
+      ],
+      products: 'Samsung 990 PRO 2TB SSD (x10)', 
+      quantity: 10, 
+      total: 1899.90, 
+      warehouse: 'WH-SOUTH', 
+      deliveryAddress: '500 Howard St, San Francisco, CA',
+      orderDate: '2026-09-20', 
+      status: 'APPROVED',
+      approvedAt: '2026-09-20 14:15',
+      managerId: 'manager@nexora.io',
+      createdAt: '2026-09-20 11:00'
+    },
+    { 
+      id: 103, 
+      orderNumber: 'ORD-2026-1003', 
+      customer: 'stripe@stripe.com',
+      customerName: 'Stripe Corporate IT',
+      items: [
+        { productId: 3, name: 'Dell UltraSharp 32" 4K Monitor', quantity: 5, price: 899.00 }
+      ],
+      products: 'Dell UltraSharp 32" Monitor (x5)', 
+      quantity: 5, 
+      total: 4495.00, 
+      warehouse: 'WH-WEST', 
+      deliveryAddress: '354 Oyster Point Blvd, South SF, CA',
+      orderDate: '2026-09-18', 
+      status: 'DISPATCHED',
+      approvedAt: '2026-09-18 09:30',
+      dispatchedAt: '2026-09-18 16:45',
+      managerId: 'manager@nexora.io',
+      assignedStaff: 'staff@nexora.io',
+      createdAt: '2026-09-18 08:00'
+    }
+  ]);
+
+  // Initial Staff Fulfillment Tasks State
+  const [staffTasks, setStaffTasks] = useState([
+    {
+      id: 5001,
+      taskId: 'TASK-2026-5001',
+      orderId: 102,
+      orderNumber: 'ORD-2026-1002',
+      customer: 'Acme Global Innovations',
+      customerEmail: 'acme@acme.io',
+      title: 'Prepare Customer Order #ORD-2026-1002',
+      items: 'Samsung 990 PRO 2TB SSD (x10)',
+      quantity: 10,
+      warehouse: 'WH-SOUTH',
+      priority: 'HIGH',
+      status: 'PENDING',
+      createdAt: '2026-09-20 14:15'
+    },
+    {
+      id: 5002,
+      taskId: 'TASK-2026-5002',
+      orderId: 103,
+      orderNumber: 'ORD-2026-1003',
+      customer: 'Stripe Corporate IT',
+      customerEmail: 'stripe@stripe.com',
+      title: 'Dispatch Order #ORD-2026-1003',
+      items: 'Dell UltraSharp 32" Monitor (x5)',
+      quantity: 5,
+      warehouse: 'WH-WEST',
+      priority: 'HIGH',
+      status: 'COMPLETED',
+      createdAt: '2026-09-18 09:30',
+      completedAt: '2026-09-18 16:45'
+    }
   ]);
 
   // Users & Roles Data
   const [usersList, setUsersList] = useState([
-    { id: 1, name: 'Sarah Jenkins', email: 'sarah.j@nexora.io', role: 'Warehouse Manager', department: 'East Coast Operations', status: 'Active', lastLogin: '2026-09-21 10:14' },
-    { id: 2, name: 'Marcus Vance', email: 'marcus.v@nexora.io', role: 'Inventory Manager', department: 'West Coast Operations', status: 'Active', lastLogin: '2026-09-21 09:30' },
-    { id: 3, name: 'David Miller', email: 'david.m@nexora.io', role: 'Warehouse Manager', department: 'Midwest Distribution', status: 'Active', lastLogin: '2026-09-20 16:45' },
-    { id: 4, name: 'Elena Rostova', email: 'elena.r@nexora.io', role: 'Procurement Manager', department: 'Global Supply Chain', status: 'Active', lastLogin: '2026-09-21 11:02' },
-    { id: 5, name: 'Navadeep Challa', email: 'challanavadeep8@gmail.com', role: 'Super Admin', department: 'Executive Management', status: 'Active', lastLogin: '2026-09-21 11:45' }
+    { id: 1, name: 'System Administrator', email: 'admin@nexora.io', role: 'ADMIN', department: 'Executive Management', assignedWarehouse: 'ALL (Global)', status: 'Active', lastLogin: '2026-09-21 14:10' },
+    { id: 2, name: 'Sarah Jenkins', email: 'manager@nexora.io', role: 'MANAGER', department: 'East Coast Operations', assignedWarehouse: 'WH-EAST', status: 'Active', lastLogin: '2026-09-21 10:14' },
+    { id: 3, name: 'Marcus Vance', email: 'staff@nexora.io', role: 'STAFF', department: 'Warehouse Fulfillment', assignedWarehouse: 'WH-EAST', status: 'Active', lastLogin: '2026-09-21 09:30' },
+    { id: 4, name: 'John Doe Customer', email: 'customer@gmail.com', role: 'CUSTOMER', department: 'Retail Buyer', assignedWarehouse: 'N/A', status: 'Active', lastLogin: '2026-09-21 12:00' },
+    { id: 5, name: 'David Miller', email: 'david.m@nexora.io', role: 'MANAGER', department: 'Midwest Distribution', assignedWarehouse: 'WH-NORTH', status: 'Active', lastLogin: '2026-09-20 16:45' }
   ]);
 
   // Audit Logs Data
@@ -882,113 +977,202 @@ export const InventoryDataProvider = ({ children }) => {
         name: newProd.name,
         category: newProd.category,
         warehouse: 'WH-EAST',
-        warehouseId: 1,
-        available: newProd.stock,
-        reserved: 0,
-        reorder: 20,
-        unitCost: newProd.unitCost,
-        unitPrice: newProd.unitPrice,
-        status: newProd.stock === 0 ? 'Out of Stock' : newProd.stock <= 20 ? 'Low Stock' : 'Healthy',
-        batchNo: 'BCH-INITIAL',
-        serialNo: 'SN-INITIAL'
+  // --- CUSTOMER CART & ORDER WORKFLOW METHODS ---
+
+  // Cart Management
+  const addToCart = (product, quantity = 1) => {
+    setCart(prev => {
+      const existingIdx = prev.findIndex(item => item.productId === product.id);
+      if (existingIdx >= 0) {
+        const updated = [...prev];
+        updated[existingIdx].quantity += quantity;
+        return updated;
       }
-    ]);
-
-    addToast(`Added product "${newProd.name}" to catalog!`);
+      return [
+        ...prev,
+        {
+          id: Date.now(),
+          productId: product.id,
+          name: product.name,
+          sku: product.sku,
+          price: product.unitPrice || 99,
+          quantity: quantity,
+          image: product.image || 'https://images.unsplash.com/photo-1526738549149-8e07eca6c147?w=500&q=80',
+          warehouse: product.warehouse || 'WH-EAST'
+        }
+      ];
+    });
+    addToast(`Added "${product.name}" to cart!`);
   };
 
-  // 8. Delete Product
-  const deleteProduct = (id) => {
-    setProducts(prev => prev.filter(p => p.id !== id));
-    setInventoryItems(prev => prev.filter(i => i.productId !== id));
-    addToast('Product removed from catalog', 'warning');
+  const removeFromCart = (cartItemId) => {
+    setCart(prev => prev.filter(item => item.id !== cartItemId));
+    addToast('Item removed from cart', 'warning');
   };
 
-  // 9. Add Supplier
-  const addSupplier = (supplier) => {
-    const newSupp = {
+  const updateCartQty = (cartItemId, newQty) => {
+    if (newQty <= 0) {
+      removeFromCart(cartItemId);
+      return;
+    }
+    setCart(prev => prev.map(item => item.id === cartItemId ? { ...item, quantity: newQty } : item));
+  };
+
+  const clearCart = () => {
+    setCart([]);
+  };
+
+  // Customer Places Order -> Status: PENDING_MANAGER_APPROVAL
+  const placeCustomerOrder = (orderInfo) => {
+    const newOrderNum = `ORD-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+    const newOrder = {
       id: Date.now(),
-      name: supplier.name,
-      contact: supplier.contact || 'N/A',
-      email: supplier.email,
-      phone: supplier.phone || 'N/A',
-      address: supplier.address || 'N/A',
-      productsSupplied: supplier.productsSupplied || 'General Supplies',
-      totalPurchases: 0,
-      status: 'Active'
-    };
-    setSuppliers(prev => [newSupp, ...prev]);
-    addToast(`Added supplier "${supplier.name}"`);
-  };
-
-  // 10. Add Customer
-  const addCustomer = (customer) => {
-    const newCust = {
-      id: Date.now(),
-      name: customer.name,
-      email: customer.email,
-      phone: customer.phone || 'N/A',
-      address: customer.address || 'N/A',
-      ordersCount: 0,
-      totalSpent: 0,
-      status: 'Standard'
-    };
-    setCustomers(prev => [newCust, ...prev]);
-    addToast(`Added customer "${customer.name}"`);
-  };
-
-  // 11. Add Purchase Order
-  const addPurchaseOrder = (po) => {
-    const newPo = {
-      id: Date.now(),
-      poNumber: `PO-2026-${Math.floor(1000 + Math.random() * 9000)}`,
-      supplier: po.supplier || 'General Supplier',
-      date: new Date().toISOString().split('T')[0],
-      expectedDelivery: po.expectedDelivery || '2026-10-01',
-      totalAmount: parseFloat(po.totalAmount || 1000),
-      status: 'Pending',
-      itemsCount: parseInt(po.itemsCount || 10, 10)
-    };
-    setPurchaseOrders(prev => [newPo, ...prev]);
-    addToast(`Purchase Order ${newPo.poNumber} created!`);
-  };
-
-  // 12. Create Order
-  const createOrder = (orderData) => {
-    const newOrd = {
-      id: Date.now(),
-      orderNumber: `ORD-2026-${Math.floor(1000 + Math.random() * 9000)}`,
-      customer: orderData.customer || 'Enterprise Client',
-      products: orderData.products || 'Mixed Equipment Order',
-      quantity: parseInt(orderData.quantity || 1, 10),
-      total: parseFloat(orderData.total || 999),
-      warehouse: orderData.warehouse || 'WH-EAST',
+      orderNumber: newOrderNum,
+      customer: orderInfo.customerEmail || 'customer@gmail.com',
+      customerName: orderInfo.customerName || 'Retail Customer',
+      items: orderInfo.items || [...cart],
+      products: (orderInfo.items || cart).map(i => `${i.name} (x${i.quantity})`).join(', '),
+      quantity: (orderInfo.items || cart).reduce((acc, i) => acc + i.quantity, 0),
+      total: orderInfo.total || cart.reduce((acc, i) => acc + (i.price * i.quantity), 0),
+      warehouse: orderInfo.warehouse || 'WH-EAST',
+      deliveryAddress: orderInfo.deliveryAddress || 'Standard Delivery Address',
       orderDate: new Date().toISOString().split('T')[0],
-      status: 'Confirmed'
+      status: 'PENDING_MANAGER_APPROVAL',
+      createdAt: new Date().toLocaleString()
     };
-    setOrders(prev => [newOrd, ...prev]);
-    addToast(`Order ${newOrd.orderNumber} placed successfully!`);
+
+    setOrders(prev => [newOrder, ...prev]);
+    clearCart();
+    addToast(`Order ${newOrderNum} placed! Awaiting Manager Approval.`);
+    return newOrder;
   };
 
-  // 13. Add User
-  const addUser = (userData) => {
+  // Manager Approves Order -> Status: APPROVED -> Creates Staff Task
+  const approveCustomerOrder = (orderId, managerEmail = 'manager@nexora.io') => {
+    let approvedOrderObj = null;
+    setOrders(prev => prev.map(ord => {
+      if (ord.id === orderId || ord.orderNumber === orderId) {
+        approvedOrderObj = { 
+          ...ord, 
+          status: 'APPROVED', 
+          approvedAt: new Date().toLocaleString(),
+          managerId: managerEmail 
+        };
+        return approvedOrderObj;
+      }
+      return ord;
+    }));
+
+    if (approvedOrderObj) {
+      // Auto create Staff task
+      const newTask = {
+        id: Date.now(),
+        taskId: `TASK-2026-${Math.floor(5000 + Math.random() * 4000)}`,
+        orderId: approvedOrderObj.id,
+        orderNumber: approvedOrderObj.orderNumber,
+        customer: approvedOrderObj.customerName || approvedOrderObj.customer,
+        customerEmail: approvedOrderObj.customer,
+        title: `Prepare Customer Order #${approvedOrderObj.orderNumber}`,
+        items: approvedOrderObj.products,
+        quantity: approvedOrderObj.quantity,
+        warehouse: approvedOrderObj.warehouse || 'WH-EAST',
+        priority: 'HIGH',
+        status: 'PENDING',
+        createdAt: new Date().toLocaleString()
+      };
+      setStaffTasks(prev => [newTask, ...prev]);
+      addToast(`Order ${approvedOrderObj.orderNumber} APPROVED! Created Staff Task ${newTask.taskId}.`);
+    }
+  };
+
+  // Manager Rejects Order -> Status: REJECTED with Reason
+  const rejectCustomerOrder = (orderId, rejectionReason = 'Insufficient stock availability', managerEmail = 'manager@nexora.io') => {
+    setOrders(prev => prev.map(ord => {
+      if (ord.id === orderId || ord.orderNumber === orderId) {
+        return {
+          ...ord,
+          status: 'REJECTED',
+          rejectedAt: new Date().toLocaleString(),
+          rejectionReason: rejectionReason,
+          managerId: managerEmail
+        };
+      }
+      return ord;
+    }));
+    addToast(`Order ${orderId} REJECTED. Customer notified.`, 'danger');
+  };
+
+  // Staff Updates Task & Order Status (PENDING -> IN_PROGRESS -> PICKED -> PACKED -> READY_FOR_DISPATCH -> DISPATCHED)
+  const updateStaffTaskStatus = (taskId, newStatus) => {
+    let targetOrderNumber = null;
+
+    setStaffTasks(prev => prev.map(t => {
+      if (t.id === taskId || t.taskId === taskId) {
+        targetOrderNumber = t.orderNumber;
+        return {
+          ...t,
+          status: newStatus,
+          completedAt: newStatus === 'COMPLETED' || newStatus === 'DISPATCHED' ? new Date().toLocaleString() : t.completedAt
+        };
+      }
+      return t;
+    }));
+
+    if (targetOrderNumber) {
+      setOrders(prev => prev.map(ord => {
+        if (ord.orderNumber === targetOrderNumber) {
+          const mapTaskToOrder = {
+            'IN_PROGRESS': 'IN_PROGRESS',
+            'PICKED': 'PICKED',
+            'PACKED': 'PACKED',
+            'READY_FOR_TRANSFER': 'READY_FOR_DISPATCH',
+            'READY_FOR_DISPATCH': 'READY_FOR_DISPATCH',
+            'COMPLETED': 'DISPATCHED',
+            'DISPATCHED': 'DISPATCHED'
+          };
+          const nextOrdStatus = mapTaskToOrder[newStatus] || newStatus;
+
+          // Auto deduct stock if dispatched
+          if (nextOrdStatus === 'DISPATCHED' && ord.items) {
+            ord.items.forEach(item => {
+              setInventoryItems(inv => inv.map(i => {
+                if (i.productId === item.productId) {
+                  const newAvail = Math.max(0, i.available - item.quantity);
+                  return { ...i, available: newAvail };
+                }
+                return i;
+              }));
+            });
+          }
+
+          return {
+            ...ord,
+            status: nextOrdStatus,
+            dispatchedAt: nextOrdStatus === 'DISPATCHED' ? new Date().toLocaleString() : ord.dispatchedAt
+          };
+        }
+        return ord;
+      }));
+      addToast(`Updated task #${taskId} to ${newStatus}.`);
+    }
+  };
+
+  // Admin User Creation for MANAGER / STAFF
+  const addManagedUser = (userData) => {
     const newUser = {
       id: Date.now(),
-      name: userData.name,
+      name: userData.fullName || userData.name,
       email: userData.email,
-      role: userData.role || 'Staff',
-      department: userData.department || 'Operations',
+      role: (userData.role || 'STAFF').toUpperCase(),
+      department: userData.department || (userData.role === 'MANAGER' ? 'Operations Supervisory' : 'Warehouse Fulfillment'),
+      assignedWarehouse: userData.assignedWarehouse || 'WH-EAST',
+      phone: userData.phone || '+1 (555) 019-2834',
       status: 'Active',
-      lastLogin: 'Never'
+      lastLogin: 'Pending Invitation Accept'
     };
     setUsersList(prev => [newUser, ...prev]);
-    addToast(`User ${userData.name} created!`);
-  };
-
-  // 14. Approve Discrepancy
-  const approveDiscrepancy = (id) => {
-    setDiscrepancies(prev => prev.map(d => d.id === id ? { ...d, status: 'Approved & Adjusted' } : d));
-    addToast(`Discrepancy adjustment approved! Stock aligned.`);
+    addToast(`Created ${newUser.role} account for ${newUser.email}! Invitation sent.`);
+    return newUser;
   };
 
   return (
@@ -1010,6 +1194,8 @@ export const InventoryDataProvider = ({ children }) => {
         suppliers,
         customers,
         orders,
+        staffTasks,
+        cart,
         usersList,
         auditLogs,
         settings,
@@ -1031,8 +1217,19 @@ export const InventoryDataProvider = ({ children }) => {
         addPurchaseOrder,
         createOrder,
         addUser,
+        addManagedUser,
         approveDiscrepancy,
-        setSettings
+        setSettings,
+
+        // Customer Cart & Orders
+        addToCart,
+        removeFromCart,
+        updateCartQty,
+        clearCart,
+        placeCustomerOrder,
+        approveCustomerOrder,
+        rejectCustomerOrder,
+        updateStaffTaskStatus
       }}
     >
       {children}
@@ -1065,3 +1262,4 @@ export const InventoryDataProvider = ({ children }) => {
 };
 
 export const useInventoryData = () => useContext(InventoryDataContext);
+
