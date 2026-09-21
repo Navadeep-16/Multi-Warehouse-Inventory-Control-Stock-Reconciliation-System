@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { Search, Bell, User, Sun, Moon, ChevronRight, LogOut, Settings, UserCircle } from 'lucide-react';
+import { Search, Bell, Sun, Moon, ChevronRight, LogOut, Settings, UserCircle, RefreshCw } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export const TopBar = () => {
-  const { user, logout } = useAuth();
+  const { user, switchRole, logout } = useAuth();
   const location = useLocation();
   const [theme, setTheme] = useState('dark');
   const [profileOpen, setProfileOpen] = useState(false);
@@ -13,8 +13,9 @@ export const TopBar = () => {
     const newTheme = theme === 'dark' ? 'light' : 'dark';
     setTheme(newTheme);
     document.documentElement.classList.toggle('dark');
-    // Note: In a real app, save to localStorage and Tailwind config
   };
+
+  const isStaff = user?.role?.toUpperCase() === 'STAFF';
 
   // Generate breadcrumbs from path
   const pathnames = location.pathname.split('/').filter((x) => x);
@@ -45,7 +46,7 @@ export const TopBar = () => {
         <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted group-focus-within:text-primary transition-colors" />
         <input 
           type="text" 
-          placeholder="Search inventory, POs, SKUs, or scans barcode..." 
+          placeholder="Search inventory, POs, SKUs, or scan barcode..." 
           className="w-full bg-surface-elevated border border-border rounded-lg pl-10 pr-16 py-2 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all text-foreground placeholder:text-muted"
         />
         <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 text-[10px] text-muted font-mono bg-surface border border-border px-1.5 py-0.5 rounded">
@@ -71,31 +72,45 @@ export const TopBar = () => {
             onClick={() => setProfileOpen(!profileOpen)}
           >
             <div className="text-right hidden sm:block">
-              <div className="text-sm font-medium text-foreground">{user?.username || 'Operator'}</div>
-              <div className="text-[10px] tracking-widest uppercase text-muted font-heading">{user?.role || 'System'}</div>
+              <div className="text-sm font-medium text-foreground">{user?.sub || user?.username || 'Operator'}</div>
+              <div className="text-[10px] tracking-widest uppercase text-primary font-bold">{user?.role || 'STAFF'}</div>
             </div>
             <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-background shadow-md">
-              <span className="font-bold text-sm">{(user?.username || 'O')[0].toUpperCase()}</span>
+              <span className="font-bold text-sm">{(user?.sub || user?.username || 'O')[0].toUpperCase()}</span>
             </div>
           </div>
 
           {/* Dropdown */}
           {profileOpen && (
-            <div className="absolute right-0 top-full mt-2 w-56 bg-surface border border-border rounded-xl shadow-2xl overflow-hidden py-1 animate-in fade-in slide-in-from-top-2">
-              <div className="px-4 py-3 border-b border-border bg-surface-elevated/50 sm:hidden">
-                <div className="text-sm font-medium text-foreground">{user?.username || 'Operator'}</div>
-                <div className="text-[10px] tracking-widest uppercase text-muted font-heading">{user?.role || 'System'}</div>
+            <div className="absolute right-0 top-full mt-2 w-64 bg-surface border border-border rounded-xl shadow-2xl overflow-hidden py-1 animate-in fade-in slide-in-from-top-2">
+              <div className="px-4 py-3 border-b border-border bg-surface-elevated/50">
+                <div className="text-sm font-medium text-foreground">{user?.sub || user?.username || 'Operator'}</div>
+                <div className="text-[10px] tracking-widest uppercase text-primary font-bold">Role: {user?.role || 'STAFF'}</div>
               </div>
-              <Link to="/profile" className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-surface-elevated transition-colors" onClick={() => setProfileOpen(false)}>
-                <UserCircle className="w-4 h-4 text-muted" /> My Profile
-              </Link>
-              <Link to="/settings" className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-surface-elevated transition-colors" onClick={() => setProfileOpen(false)}>
-                <Settings className="w-4 h-4 text-muted" /> Preferences
-              </Link>
+
+              {/* Role Switcher Option */}
+              <button
+                onClick={() => {
+                  switchRole(isStaff ? 'MANAGER' : 'STAFF');
+                  setProfileOpen(false);
+                }}
+                className="w-full flex items-center gap-3 px-4 py-2.5 text-xs text-primary font-semibold hover:bg-surface-elevated transition-colors text-left"
+              >
+                <RefreshCw className="w-4 h-4" />
+                <span>Switch to {isStaff ? 'Manager Dashboard' : 'Staff Dashboard'}</span>
+              </button>
+
               <div className="h-px bg-border my-1"></div>
+
+              <Link to="/settings" className="flex items-center gap-3 px-4 py-2.5 text-xs text-foreground hover:bg-surface-elevated transition-colors" onClick={() => setProfileOpen(false)}>
+                <Settings className="w-4 h-4 text-muted" /> Preferences & Settings
+              </Link>
+
+              <div className="h-px bg-border my-1"></div>
+              
               <button 
                 onClick={() => { setProfileOpen(false); logout(); }}
-                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-danger hover:bg-danger/10 transition-colors text-left font-medium"
+                className="w-full flex items-center gap-3 px-4 py-2.5 text-xs text-danger hover:bg-danger/10 transition-colors text-left font-medium"
               >
                 <LogOut className="w-4 h-4" /> Sign Out Session
               </button>
