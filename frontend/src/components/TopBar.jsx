@@ -79,8 +79,8 @@ export const TopBar = () => {
           {profileOpen && (
             <div className="absolute right-0 top-full mt-2 w-56 bg-[#0D141E] border border-[#1D2A3A] rounded-xl shadow-2xl overflow-hidden py-1 z-50 animate-in fade-in slide-in-from-top-2">
               <div className="px-4 py-2.5 border-b border-[#1D2A3A] bg-[#111A26]">
-                <div className="text-xs font-semibold text-[#F5F7FA]">{user?.sub || 'staff@nexora.io'}</div>
-                <div className="text-[10px] font-extrabold text-[#E7B65A] uppercase">Role: STAFF</div>
+                <div className="text-xs font-semibold text-[#F5F7FA]">{user?.sub || user?.username || 'user@nexora.io'}</div>
+                <div className="text-[10px] font-extrabold text-[#E7B65A] uppercase">Role: {isStaff ? 'STAFF' : user?.role || 'MANAGER'}</div>
               </div>
 
               <Link to="/profile" className="flex items-center gap-2.5 px-4 py-2 text-xs text-[#F5F7FA] hover:bg-[#111A26] transition-colors" onClick={() => setProfileOpen(false)}>

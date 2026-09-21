@@ -3,6 +3,34 @@ import { jwtDecode } from 'jwt-decode';
 
 const AuthContext = createContext(null);
 
+export const getUserRole = (userObj) => {
+  if (!userObj) return 'MANAGER';
+  let rawRole = userObj.role;
+  if (!rawRole && Array.isArray(userObj.roles)) {
+    rawRole = userObj.roles[0];
+  }
+  if (!rawRole && Array.isArray(userObj.authorities)) {
+    rawRole = userObj.authorities[0];
+  }
+  if (rawRole) {
+    const cleaned = String(rawRole).replace(/^ROLE_/i, '').toUpperCase();
+    if (cleaned === 'STAFF' || cleaned === 'MANAGER') return cleaned;
+  }
+  // Fallback check on email / username / sub
+  const identifier = String(userObj.sub || userObj.username || userObj.email || '').toLowerCase();
+  if (identifier.includes('staff')) return 'STAFF';
+  return 'MANAGER';
+};
+
+const normalizeUser = (decoded, forcedRole) => {
+  if (!decoded) return null;
+  const computedRole = forcedRole || getUserRole(decoded);
+  return {
+    ...decoded,
+    role: computedRole
+  };
+};
+
 // Fallback dummy token generator
 export const createDemoToken = (username = 'admin@nexora.io', role = 'MANAGER') => {
   const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
@@ -17,7 +45,7 @@ export const AuthProvider = ({ children }) => {
     if (token) {
       try {
         const decoded = jwtDecode(token);
-        return decoded;
+        return normalizeUser(decoded);
       } catch (e) {
         return { sub: 'admin@nexora.io', role: 'MANAGER' };
       }
@@ -30,7 +58,7 @@ export const AuthProvider = ({ children }) => {
     if (token) {
       try {
         const decoded = jwtDecode(token);
-        setUser(decoded);
+        setUser(normalizeUser(decoded));
       } catch (e) {
         setUser({ sub: 'admin@nexora.io', role: 'MANAGER' });
       }
@@ -54,8 +82,9 @@ export const AuthProvider = ({ children }) => {
       decodedUser = { sub: tokenOrUsername || 'admin@nexora.io', role };
     }
 
+    const normalized = normalizeUser(decodedUser, role);
     localStorage.setItem('token', finalToken);
-    setUser(decodedUser);
+    setUser(normalized);
   };
 
   const switchRole = (newRole) => {
@@ -71,10 +100,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, switchRole, logout }}>
+    <AuthContext.Provider value={{ user, login, switchRole, logout, getUserRole: () => getUserRole(user) }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
 export const useAuth = () => useContext(AuthContext);
+
