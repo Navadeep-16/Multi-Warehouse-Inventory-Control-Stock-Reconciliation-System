@@ -28,27 +28,37 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody AuthRequest request) {
-        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists");
+        try {
+            if (userRepository.findByUsername(request.getUsername()).isPresent()) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists");
+            }
+
+            User user = new User();
+            user.setUsername(request.getUsername());
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+            user.setRole(request.getRole() != null ? request.getRole().toUpperCase() : "STAFF");
+
+            userRepository.save(user);
+            return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Registration failed: " + e.getMessage());
         }
-
-        User user = new User();
-        user.setUsername(request.getUsername());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole(request.getRole() != null ? request.getRole().toUpperCase() : "STAFF");
-
-        userRepository.save(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequest request) {
-        Optional<User> optionalUser = userRepository.findByUsername(request.getUsername());
-        if (optionalUser.isEmpty() || !passwordEncoder.matches(request.getPassword(), optionalUser.get().getPassword())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
-        }
+        try {
+            Optional<User> optionalUser = userRepository.findByUsername(request.getUsername());
+            if (optionalUser.isEmpty() || !passwordEncoder.matches(request.getPassword(), optionalUser.get().getPassword())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+            }
 
-        String token = jwtService.generateToken(optionalUser.get());
-        return ResponseEntity.ok(new AuthResponse(token));
+            String token = jwtService.generateToken(optionalUser.get());
+            return ResponseEntity.ok(new AuthResponse(token));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Login failed: " + e.getMessage());
+        }
     }
 }
