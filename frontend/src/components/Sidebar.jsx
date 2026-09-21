@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { 
   LayoutDashboard, Package, Warehouse, ShoppingCart, Bell, Hexagon, 
   Layers, ArrowRightLeft, Activity, Users, Settings, 
   BarChart2, FileText, ChevronDown, ChevronRight, ShieldCheck, 
-  UserCircle, HelpCircle, Truck, Database, Smartphone, QrCode
+  UserCircle, HelpCircle, Truck, Database, Smartphone, QrCode, CheckSquare, RotateCcw
 } from 'lucide-react';
 
 export const Sidebar = () => {
   const location = useLocation();
+  const { user } = useAuth();
 
-  const menuGroups = [
+  const isStaff = user?.role?.toUpperCase() === 'STAFF';
+
+  // Manager Default Menu Structure
+  const managerMenuGroups = [
     {
       group: 'CORE',
       items: [
@@ -107,11 +112,143 @@ export const Sidebar = () => {
     }
   ];
 
+  // EXACT STAFF MENU STRUCTURE SPECIFIED BY USER
+  const staffMenuGroups = [
+    {
+      group: 'CORE',
+      items: [
+        { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
+        { 
+          label: 'Inventory', icon: Layers, 
+          submenus: [
+            { label: 'All Inventory', path: '/inventory' },
+            { label: 'Available Stock', path: '/inventory/available' },
+            { label: 'Low Stock', path: '/inventory/low-stock' },
+            { label: 'Out of Stock', path: '/inventory/out-of-stock' },
+            { label: 'Expiring Soon', path: '/inventory/expiring' },
+            { label: 'Stock Movement', path: '/inventory/movement' }
+          ]
+        },
+        { 
+          label: 'Products', icon: Package,
+          submenus: [
+            { label: 'All Products', path: '/products' },
+            { label: 'Product Details', path: '/products/details' },
+            { label: 'Batches & Serial Numbers', path: '/products/batches-serials' }
+          ]
+        },
+        { 
+          label: 'Warehouses', icon: Warehouse,
+          submenus: [
+            { label: 'My Warehouse', path: '/warehouses/my-warehouse' },
+            { label: 'Locations & Zones', path: '/warehouses/locations' },
+            { label: 'Bin Locations', path: '/warehouses/bin-locations' }
+          ]
+        },
+        { 
+          label: 'Orders', icon: ShoppingCart,
+          submenus: [
+            { label: 'All Orders', path: '/orders' },
+            { label: 'Pending Orders', path: '/orders/pending' },
+            { label: 'Processing Orders', path: '/orders/processing' },
+            { label: 'Completed Orders', path: '/orders/completed' }
+          ]
+        }
+      ]
+    },
+    {
+      group: 'OPERATIONS',
+      items: [
+        {
+          label: 'Stock Operations', icon: Activity,
+          submenus: [
+            { label: 'Stock In (Receive)', path: '/operations/stock-in' },
+            { label: 'Stock Out (Issue)', path: '/operations/stock-out' },
+            { label: 'Stock Adjustments', path: '/operations/stock-adjustments' },
+            { label: 'Stock Returns', path: '/operations/stock-returns' }
+          ]
+        },
+        {
+          label: 'Transfers', icon: ArrowRightLeft,
+          submenus: [
+            { label: 'All Transfers', path: '/transfers' },
+            { label: 'Create Transfer', path: '/transfers/create' },
+            { label: 'My Transfer Requests', path: '/transfers/my-requests' },
+            { label: 'Transfer History', path: '/transfers/history' }
+          ]
+        },
+        {
+          label: 'Reconciliation', icon: ShieldCheck,
+          submenus: [
+            { label: 'Physical Stock Count', path: '/reconciliation/physical-count' },
+            { label: 'My Counting Tasks', path: '/reconciliation/my-tasks' },
+            { label: 'Count History', path: '/reconciliation/history' }
+          ]
+        },
+        {
+          label: 'Returns', icon: RotateCcw,
+          submenus: [
+            { label: 'Customer Returns', path: '/returns/customer' },
+            { label: 'Supplier Returns', path: '/returns/supplier' },
+            { label: 'Return History', path: '/returns/history' }
+          ]
+        }
+      ]
+    },
+    {
+      group: 'TASKS',
+      items: [
+        {
+          label: 'Tasks', icon: CheckSquare,
+          submenus: [
+            { label: 'My Tasks', path: '/tasks/my-tasks' },
+            { label: 'Pending Tasks', path: '/tasks/pending' },
+            { label: 'Completed Tasks', path: '/tasks/completed' },
+            { label: 'Task History', path: '/tasks/history' }
+          ]
+        }
+      ]
+    },
+    {
+      group: 'TOOLS',
+      items: [
+        {
+          label: 'Barcode / QR', icon: QrCode,
+          submenus: [
+            { label: 'Scan Product', path: '/barcode-qr/scan-product' },
+            { label: 'Scan Location', path: '/barcode-qr/scan-location' },
+            { label: 'Scan Serial Number', path: '/barcode-qr/scan-serial' }
+          ]
+        },
+        {
+          label: 'Reports', icon: FileText,
+          submenus: [
+            { label: 'Stock Report', path: '/reports/stock' },
+            { label: 'Stock Movement Report', path: '/reports/stock-movement' },
+            { label: 'Transfer Report', path: '/reports/transfer' },
+            { label: 'Daily Activity Report', path: '/reports/daily-activity' }
+          ]
+        },
+        { label: 'Notifications', icon: Bell, path: '/notifications' }
+      ]
+    },
+    {
+      group: 'ACCOUNT',
+      items: [
+        { label: 'My Profile', icon: UserCircle, path: '/profile' },
+        { label: 'My Activity', icon: FileText, path: '/activity' },
+        { label: 'Help & Support', icon: HelpCircle, path: '/help-support' },
+        { label: 'Settings', icon: Settings, path: '/settings' }
+      ]
+    }
+  ];
+
+  const menuGroups = isStaff ? staffMenuGroups : managerMenuGroups;
+
   const [expandedMenus, setExpandedMenus] = useState(() => {
     const saved = localStorage.getItem('expandedMenus');
     const initial = saved ? JSON.parse(saved) : {};
 
-    // Auto expand parent menus if current route matches a child
     menuGroups.forEach(group => {
       group.items.forEach(item => {
         if (item.submenus) {
@@ -125,7 +262,6 @@ export const Sidebar = () => {
   });
 
   useEffect(() => {
-    // Automatically expand parent menu whenever location changes to a child route
     menuGroups.forEach(group => {
       group.items.forEach(item => {
         if (item.submenus) {
@@ -136,7 +272,7 @@ export const Sidebar = () => {
         }
       });
     });
-  }, [location.pathname]);
+  }, [location.pathname, isStaff]);
 
   useEffect(() => {
     localStorage.setItem('expandedMenus', JSON.stringify(expandedMenus));
@@ -152,9 +288,16 @@ export const Sidebar = () => {
   return (
     <aside className="w-72 bg-surface border-r border-border flex flex-col h-screen sticky top-0 overflow-hidden shrink-0">
       {/* Logo Area */}
-      <div className="p-6 flex items-center gap-3 border-b border-border">
-        <Hexagon className="w-8 h-8 text-primary" fill="currentColor" fillOpacity={0.2} />
-        <span className="font-heading font-bold text-2xl tracking-[0.15em] text-foreground">NEXORA</span>
+      <div className="p-6 flex items-center justify-between border-b border-border">
+        <div className="flex items-center gap-3">
+          <Hexagon className="w-8 h-8 text-primary" fill="currentColor" fillOpacity={0.2} />
+          <span className="font-heading font-bold text-2xl tracking-[0.15em] text-foreground">NEXORA</span>
+        </div>
+        {isStaff && (
+          <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-primary/20 text-primary border border-primary/30">
+            STAFF
+          </span>
+        )}
       </div>
 
       {/* Navigation */}
