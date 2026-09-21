@@ -2,32 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, Package, Warehouse, ShoppingCart, Bell, Hexagon, 
-  Layers, ArrowRightLeft, Activity, Users, Settings, Search, 
+  Layers, ArrowRightLeft, Activity, Users, Settings, 
   BarChart2, FileText, ChevronDown, ChevronRight, ShieldCheck, 
   UserCircle, HelpCircle, Truck, Database, Smartphone, QrCode
 } from 'lucide-react';
 
 export const Sidebar = () => {
   const location = useLocation();
-  const [expandedMenus, setExpandedMenus] = useState(() => {
-    const saved = localStorage.getItem('expandedMenus');
-    return saved ? JSON.parse(saved) : {};
-  });
-
-  useEffect(() => {
-    localStorage.setItem('expandedMenus', JSON.stringify(expandedMenus));
-  }, [expandedMenus]);
-
-  const toggleMenu = (label) => {
-    setExpandedMenus(prev => ({
-      ...prev,
-      [label]: !prev[label]
-    }));
-  };
 
   const menuGroups = [
     {
-      group: 'Core',
+      group: 'CORE',
       items: [
         { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
         { 
@@ -52,21 +37,21 @@ export const Sidebar = () => {
           label: 'Products', icon: Package,
           submenus: [
             { label: 'All Products', path: '/products' },
-            { label: 'Categories & Brands', path: '/products/categories' },
-            { label: 'Batches & Serial Nos', path: '/products/batches' }
+            { label: 'Categories & Brands', path: '/products/categories-brands' },
+            { label: 'Batches & Serial Nos', path: '/products/batches-serials' }
           ]
         }
       ]
     },
     {
-      group: 'Operations',
+      group: 'OPERATIONS',
       items: [
         {
           label: 'Stock Operations', icon: Activity,
           submenus: [
             { label: 'Stock In (Receive)', path: '/operations/stock-in' },
             { label: 'Stock Out (Issue)', path: '/operations/stock-out' },
-            { label: 'Stock Adjustments', path: '/operations/adjustments' }
+            { label: 'Stock Adjustments', path: '/operations/stock-adjustments' }
           ]
         },
         {
@@ -74,27 +59,27 @@ export const Sidebar = () => {
           submenus: [
             { label: 'All Transfers', path: '/transfers' },
             { label: 'Create Transfer', path: '/transfers/create' },
-            { label: 'Pending Approvals', path: '/transfers/approvals' }
+            { label: 'Pending Approvals', path: '/transfers/pending' }
           ]
         },
         {
           label: 'Reconciliation', icon: ShieldCheck,
           submenus: [
             { label: 'Reconciliation Dash', path: '/reconciliation' },
-            { label: 'Physical Stock Count', path: '/reconciliation/count' },
-            { label: 'Discrepancy Review', path: '/reconciliation/review' }
+            { label: 'Physical Stock Count', path: '/reconciliation/physical-count' },
+            { label: 'Discrepancy Review', path: '/reconciliation/discrepancies' }
           ]
         }
       ]
     },
     {
-      group: 'Supply Chain',
+      group: 'SUPPLY CHAIN',
       items: [
         {
           label: 'Procurement', icon: Truck,
           submenus: [
-            { label: 'Purchase Orders', path: '/procurement/orders' },
-            { label: 'Purchase Requests', path: '/procurement/requests' }
+            { label: 'Purchase Orders', path: '/procurement/purchase-orders' },
+            { label: 'Purchase Requests', path: '/procurement/purchase-requests' }
           ]
         },
         { label: 'Orders', icon: ShoppingCart, path: '/orders' },
@@ -103,27 +88,69 @@ export const Sidebar = () => {
       ]
     },
     {
-      group: 'Insights & Tools',
+      group: 'INSIGHTS & TOOLS',
       items: [
         { label: 'Smart Inventory', icon: Smartphone, path: '/smart-inventory' },
         { label: 'Analytics', icon: BarChart2, path: '/analytics' },
         { label: 'Reports', icon: FileText, path: '/reports' },
-        { label: 'Barcode/QR', icon: QrCode, path: '/barcode' }
+        { label: 'Barcode/QR', icon: QrCode, path: '/barcode-qr' }
       ]
     },
     {
-      group: 'Administration',
+      group: 'ADMINISTRATION',
       items: [
-        { label: 'Users & Roles', icon: UserCircle, path: '/admin/users' },
-        { label: 'Audit Logs', icon: FileText, path: '/admin/audit' },
+        { label: 'Users & Roles', icon: UserCircle, path: '/users-roles' },
+        { label: 'Audit Logs', icon: FileText, path: '/audit-logs' },
         { label: 'Settings', icon: Settings, path: '/settings' },
-        { label: 'Help & Support', icon: HelpCircle, path: '/support' }
+        { label: 'Help & Support', icon: HelpCircle, path: '/help-support' }
       ]
     }
   ];
 
+  const [expandedMenus, setExpandedMenus] = useState(() => {
+    const saved = localStorage.getItem('expandedMenus');
+    const initial = saved ? JSON.parse(saved) : {};
+
+    // Auto expand parent menus if current route matches a child
+    menuGroups.forEach(group => {
+      group.items.forEach(item => {
+        if (item.submenus) {
+          const matches = item.submenus.some(sub => location.pathname === sub.path);
+          if (matches) initial[item.label] = true;
+        }
+      });
+    });
+
+    return initial;
+  });
+
+  useEffect(() => {
+    // Automatically expand parent menu whenever location changes to a child route
+    menuGroups.forEach(group => {
+      group.items.forEach(item => {
+        if (item.submenus) {
+          const matches = item.submenus.some(sub => location.pathname === sub.path);
+          if (matches) {
+            setExpandedMenus(prev => ({ ...prev, [item.label]: true }));
+          }
+        }
+      });
+    });
+  }, [location.pathname]);
+
+  useEffect(() => {
+    localStorage.setItem('expandedMenus', JSON.stringify(expandedMenus));
+  }, [expandedMenus]);
+
+  const toggleMenu = (label) => {
+    setExpandedMenus(prev => ({
+      ...prev,
+      [label]: !prev[label]
+    }));
+  };
+
   return (
-    <aside className="w-72 bg-surface border-r border-border flex flex-col h-screen sticky top-0 overflow-hidden">
+    <aside className="w-72 bg-surface border-r border-border flex flex-col h-screen sticky top-0 overflow-hidden shrink-0">
       {/* Logo Area */}
       <div className="p-6 flex items-center gap-3 border-b border-border">
         <Hexagon className="w-8 h-8 text-primary" fill="currentColor" fillOpacity={0.2} />
@@ -142,10 +169,8 @@ export const Sidebar = () => {
                 const isExpanded = expandedMenus[item.label];
                 const hasSubmenus = item.submenus && item.submenus.length > 0;
                 
-                // Check if current path matches any submenu path
-                const isActive = item.path 
-                  ? location.pathname.startsWith(item.path)
-                  : hasSubmenus && item.submenus.some(sub => location.pathname.startsWith(sub.path));
+                const isChildActive = hasSubmenus && item.submenus.some(sub => location.pathname === sub.path);
+                const isParentActive = item.path ? location.pathname === item.path : isChildActive;
 
                 return (
                   <div key={item.label}>
@@ -153,16 +178,16 @@ export const Sidebar = () => {
                       <button
                         onClick={() => toggleMenu(item.label)}
                         className={`w-full flex items-center justify-between px-4 py-2.5 rounded-lg transition-all duration-200 ${
-                          isActive && !isExpanded
-                            ? 'bg-surface-elevated text-primary border-l-2 border-primary shadow-[inset_0px_0px_16px_rgba(0,229,184,0.05)]'
+                          isChildActive && !isExpanded
+                            ? 'bg-surface-elevated text-primary border-l-2 border-primary shadow-[inset_0px_0px_16px_rgba(214,168,95,0.08)] font-semibold'
                             : 'text-muted hover:bg-surface-elevated hover:text-foreground'
                         }`}
                       >
                         <div className="flex items-center gap-3">
-                          <item.icon className="w-5 h-5" />
+                          <item.icon className="w-5 h-5 text-muted" />
                           <span className="font-medium text-sm">{item.label}</span>
                         </div>
-                        {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                        {isExpanded ? <ChevronDown className="w-4 h-4 text-muted" /> : <ChevronRight className="w-4 h-4 text-muted" />}
                       </button>
                     ) : (
                       <NavLink
@@ -170,7 +195,7 @@ export const Sidebar = () => {
                         className={({ isActive }) =>
                           `flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 ${
                             isActive
-                              ? 'bg-surface-elevated text-primary border-l-2 border-primary shadow-[inset_0px_0px_16px_rgba(0,229,184,0.05)]'
+                              ? 'bg-surface-elevated text-primary border-l-2 border-primary shadow-[inset_0px_0px_16px_rgba(214,168,95,0.08)] font-semibold'
                               : 'text-muted hover:bg-surface-elevated hover:text-foreground'
                           }`
                         }
@@ -187,10 +212,11 @@ export const Sidebar = () => {
                           <NavLink
                             key={sub.path}
                             to={sub.path}
+                            end
                             className={({ isActive }) =>
                               `block px-4 py-2 rounded-md text-sm transition-all duration-200 ${
                                 isActive
-                                  ? 'bg-primary/10 text-primary font-semibold'
+                                  ? 'bg-primary/10 text-primary font-bold border-l-2 border-primary'
                                   : 'text-muted hover:bg-surface-elevated hover:text-foreground'
                               }`
                             }
@@ -208,14 +234,23 @@ export const Sidebar = () => {
         ))}
       </nav>
 
-      {/* System Status Footer */}
-      <div className="p-4 border-t border-border m-4 rounded-xl bg-surface-elevated flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-2 text-muted text-sm">
+      {/* Clickable System Status Footer */}
+      <NavLink 
+        to="/system-status"
+        className={({ isActive }) =>
+          `p-4 border border-border m-4 rounded-xl flex items-center justify-between shrink-0 transition-all ${
+            isActive 
+              ? 'bg-primary/10 border-primary text-primary shadow-[0_0_15px_rgba(214,168,95,0.15)]' 
+              : 'bg-surface-elevated hover:border-primary/50 text-muted hover:text-foreground'
+          }`
+        }
+      >
+        <div className="flex items-center gap-2 text-sm">
           <Bell className="w-4 h-4" />
-          <span>System Status</span>
+          <span className="font-medium">System Status</span>
         </div>
-        <div className="w-2 h-2 rounded-full bg-success animate-pulse shadow-[0_0_8px_rgba(0,229,184,0.8)]"></div>
-      </div>
+        <div className="w-2.5 h-2.5 rounded-full bg-success animate-pulse shadow-[0_0_8px_rgba(111,175,143,0.8)]"></div>
+      </NavLink>
     </aside>
   );
 };
