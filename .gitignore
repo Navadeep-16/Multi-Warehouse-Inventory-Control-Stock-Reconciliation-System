@@ -36,3 +36,7 @@ yarn-error.log*
 .DS_Store
 Thumbs.db
 Desktop.ini
+
+# Local runtime data & logs
+data/
+logs/
