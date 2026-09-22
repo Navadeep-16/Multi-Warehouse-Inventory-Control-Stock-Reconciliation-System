@@ -2,6 +2,10 @@ param(
     [switch]$skipBuild
 )
 
+if (-not $env:SPRING_DATASOURCE_PASSWORD) {
+    Write-Host "Tip: Set `$env:SPRING_DATASOURCE_PASSWORD before running if using remote DB." -ForegroundColor Yellow
+}
+
 if (-not $skipBuild) {
     Write-Host "Building project..." -ForegroundColor Cyan
     $mvnCmd = "mvn"
